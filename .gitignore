@@ -1,0 +1,51 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+*.log
+
+# === Entornos Virtuales ===
+venv/
+env/
+.venv/
+.env/
+
+# === Archivos de configuración sensibles ===
+*.env
+.env.*
+secret.key
+*.pem
+
+# === Django ===
+db.sqlite3
+db.sqlite3-journal
+
+# ARCHIVOS DE MIGRACIONES (importante para tu caso)
+**/migrations/
+!**/migrations/__init__.py
+
+# === Archivos estáticos generados ===
+staticfiles/
+static/
+media/
+
+# === IDEs / Editores ===
+.vscode/
+.idea/
+*.swp
+*~
+
+# === Sistema / OS ===
+.DS_Store
+Thumbs.db
+
+# === Coverage / Testing ===
+htmlcov/
+.tox/
+.coverage
+coverage.xml
+.pytest_cache/
