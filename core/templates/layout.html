@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>NATURAL HOME</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script defer src="/static/js/app.js"></script>
+</head>
+<body>
+
+<header class="top-header">
+    <div class="logo">🌱 NATURAL HOME</div>
+    <button class="btn-cart" onclick="abrirCarrito()">🛒 Ver Carrito <span id="carritoCount">0</span></button>
+</header>
+
+<div class="super-desc">🔥 SUPER DESCUENTOS DE NATURAL HOME</div>
+
+{% block content %}{% endblock %}
+
+<div id="modalCarrito" class="modal">
+    <div class="modal-content">
+        <h3>Tu Carrito</h3>
+        <div id="carritoItems"></div>
+        <button class="btn-send">🧾 Completar Datos de Envío</button>
+    </div>
+</div>
+
+</body>
+</html>

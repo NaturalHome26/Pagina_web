@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Productos - NATURAL HOME</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-header">
+        <div class="logo">NATURAL HOME - Admin</div>
+        <div class="header-actions">
+            <a href="{% url 'home' %}" class="btn-volver"><i class="fas fa-store"></i> Ver Tienda</a>
+            <a href="{% url 'admin_new' %}" class="btn-save"><i class="fas fa-plus"></i> Nuevo Producto</a>
+        </div>
+    </header>
+    
+    <main class="admin-container">
+        <div class="admin-header">
+            <h2><i class="fas fa-boxes"></i> Panel de Productos</h2>
+            
+            <!-- Buscador -->
+            <form method="get" class="admin-search-form">
+                <div class="search-wrapper">
+                    <input type="text" name="q" value="{{ query|default_if_none:'' }}" 
+                           placeholder="Buscar productos por título o categoría..." class="search-input">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                    {% if query %}
+                    <a href="{% url 'admin_products' %}" class="search-clear" title="Limpiar búsqueda"><i class="fas fa-times"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        
+        <!-- Información de resultados -->
+        <div class="results-info">
+            <p>
+                <i class="fas fa-info-circle"></i>
+                Mostrando <strong>{{ productos.start_index }} - {{ productos.end_index }}</strong> 
+                de <strong>{{ productos.paginator.count }}</strong> productos
+                {% if query %} encontrados{% endif %}
+            </p>
+        </div>
+        
+        {% if productos %}
+        <div class="table-responsive">
+            <table class="tabla-admin">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Título</th>
+                        <th>Precio</th>
+                        <th>Unidad</th>
+                        <th>Categoría</th>
+                        <th>Descuento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td class="id-column">{{ p.id }}</td>
+                        <td>
+                            {% if p.imagen %}
+                            <img src="{{ p.imagen.url }}" class="admin-thumb" alt="{{ p.titulo }}">
+                            {% else %}
+                            <div class="admin-thumb no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="title-column">{{ p.titulo }}</td>
+                        <td class="price-column">
+                            {% if p.descuento_activo %}
+                            <div class="price-with-discount">
+                                <span class="original-price">${{ p.precio }}</span>
+                                <span class="discount-price">${{ p.precio_con_descuento }}</span>
+                            </div>
+                            {% else %}
+                            <span class="normal-price">${{ p.precio }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="unit-column">
+                            <span class="unit-badge">{{ p.get_unidad_display }}</span>
+                        </td>
+                        <td class="category-column">
+                            <span class="category-badge {{ p.categoria }}">
+                                {% if p.categoria == "frutas" %}<i class="fas fa-apple-alt"></i>{% endif %}
+                                {% if p.categoria == "verduras" %}<i class="fas fa-carrot"></i>{% endif %}
+                                {% if p.categoria == "otros" %}<i class="fas fa-shopping-basket"></i>{% endif %}
+                                {{ p.get_categoria_display }}
+                            </span>
+                        </td>
+                        <td class="discount-column">
+                            {% if p.descuento_activo %}
+                            <span class="badge-descuento-table">
+                                <i class="fas fa-percentage"></i> {{ p.porcentaje_descuento }}%
+                            </span>
+                            {% else %}
+                            <span class="badge-no">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="actions-column">
+                            <a href="{% url 'admin_edit' p.id %}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginación -->
+        {% if productos.paginator.num_pages > 1 %}
+        <div class="pagination">
+            <div class="pagination-info">
+                <i class="fas fa-file-alt"></i> Página {{ productos.number }} de {{ productos.paginator.num_pages }}
+            </div>
+            
+            <div class="pagination-controls">
+                {% if productos.has_previous %}
+                <a href="?page=1{% if query %}&q={{ query }}{% endif %}" class="pagination-btn first"><i class="fas fa-angle-double-left"></i> Primera</a>
+                <a href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="pagination-btn prev"><i class="fas fa-angle-left"></i> Anterior</a>
+                {% else %}
+                <span class="pagination-btn disabled"><i class="fas fa-angle-double-left"></i> Primera</span>
+                <span class="pagination-btn disabled"><i class="fas fa-angle-left"></i> Anterior</span>
+                {% endif %}
+                
+                <div class="pagination-numbers">
+                    {% for num in productos.paginator.page_range %}
+                        {% if productos.number == num %}
+                        <span class="pagination-number active">{{ num }}</span>
+                        {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                        <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" class="pagination-number">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                {% if productos.has_next %}
+                <a href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="pagination-btn next">Siguiente <i class="fas fa-angle-right"></i></a>
+                <a href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" class="pagination-btn last">Última <i class="fas fa-angle-double-right"></i></a>
+                {% else %}
+                <span class="pagination-btn disabled">Siguiente <i class="fas fa-angle-right"></i></span>
+                <span class="pagination-btn disabled">Última <i class="fas fa-angle-double-right"></i></span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            {% if query %}
+            <p>No se encontraron productos que coincidan con "<strong>{{ query }}</strong>"</p>
+            <a href="{% url 'admin_products' %}" class="btn-cancel"><i class="fas fa-boxes"></i> Ver todos los productos</a>
+            {% else %}
+            <p>No hay productos registrados.</p>
+            <a href="{% url 'admin_new' %}" class="btn-save"><i class="fas fa-plus-circle"></i> Crear primer producto</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>
