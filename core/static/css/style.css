@@ -2093,3 +2093,89 @@ img {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
 }
+
+/* Contenedor del modal */
+.modal-content {
+    padding: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    max-width: 620px;
+    width: 95%;
+}
+
+/* Título */
+#modalProductoTitulo {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0;
+    padding: 18px;
+    background-color: #23a455;
+    color: white;
+}
+
+/* Imagen del producto */
+#modalProductoImagen {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+/* Descripción */
+.modal-product-description {
+    font-size: 17px;
+    color: #444;
+    text-align: center;
+    padding: 10px 30px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Precio + Unidad */
+.modal-price-wrapper {
+    text-align: center;
+    margin: 5px 0 20px;
+}
+
+.modal-price-wrapper span {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* Cantidad */
+.modal-cantidad-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+.modal-cantidad-wrapper input[type="number"] {
+    width: 110px;
+    padding: 6px 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Botón agregar */
+#modalProductoAgregar {
+    display: block;
+    margin: 0 auto 25px;
+    padding: 10px 25px;
+    background-color: #ffb74d;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+#modalProductoAgregar:hover {
+    background-color: #ffa726;
+}

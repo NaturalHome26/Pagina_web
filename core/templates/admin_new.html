@@ -8,211 +8,183 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <header class="top-header">
-        <div class="logo">NATURAL HOME - Admin</div>
-        <a href="{% url 'admin_products' %}" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver</a>
-    </header>
 
-    <main class="admin-container">
-        <div class="admin-header">
-            <h2><i class="fas fa-plus-circle"></i> Crear Producto Nuevo</h2>
-        </div>
-        
-        {% if error %}
-        <div class="alert-error">
-            <i class="fas fa-exclamation-circle"></i> {{ error }}
-        </div>
-        {% endif %}
-        
-        <form method="post" enctype="multipart/form-data" class="admin-form" id="productForm">
-            {% csrf_token %}
-            
-            <div class="form-section">
-                <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
+<body>
+<header class="top-header">
+    <div class="logo">NATURAL HOME - Admin</div>
+    <a href="{% url 'admin_products' %}" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver</a>
+</header>
+
+<main class="admin-container">
+    <div class="admin-header">
+        <h2><i class="fas fa-plus-circle"></i> Crear Producto Nuevo</h2>
+    </div>
+
+    {% if error %}
+    <div class="alert-error">
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="admin-form" id="productForm">
+        {% csrf_token %}
+
+        <!-- ░░ INFORMACIÓN BÁSICA ░░ -->
+        <div class="form-section">
+            <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
+
+            <div class="form-group">
+                <label for="id_titulo"><i class="fas fa-heading"></i> Título *</label>
+                <input id="id_titulo" name="titulo" type="text" required>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                    <label for="id_titulo"><i class="fas fa-heading"></i> Título *</label>
-                    <input id="id_titulo" name="titulo" type="text" required>
+                    <label for="id_precio"><i class="fas fa-tag"></i> Precio ($) *</label>
+                    <input id="id_precio" name="precio" type="number" step="0.01" min="0" required>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="id_precio"><i class="fas fa-tag"></i> Precio ($) *</label>
-                        <input id="id_precio" name="precio" type="number" step="0.01" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="id_unidad"><i class="fas fa-weight"></i> Unidad de medida *</label>
-                        <select id="id_unidad" name="unidad" required>
-                            <option value="">Seleccione unidad</option>
-                            <option value="kg">Kilogramo (kg)</option>
-                            <option value="unidad" selected>Unidad</option>
-                            <option value="paquete">Paquete</option>
-                        </select>
-                    </div>
-                </div>
-                
+
                 <div class="form-group">
-                    <label for="id_categoria"><i class="fas fa-tags"></i> Categoría *</label>
-                    <select id="id_categoria" name="categoria" required>
-                        <option value="">Seleccione una categoría</option>
-                        <option value="frutas">Frutas</option>
-                        <option value="verduras">Verduras</option>
-                        <option value="otros">Otros</option>
+                    <label for="id_unidad"><i class="fas fa-weight"></i> Unidad de medida *</label>
+                    <select id="id_unidad" name="unidad" required>
+                        <option value="">Seleccione unidad</option>
+                        <option value="kg">Kilogramo (kg)</option>
+                        <option value="unidad" selected>Unidad</option>
+                        <option value="paquete">Paquete</option>
                     </select>
                 </div>
             </div>
-            
-            <div class="form-section">
-                <h3 class="form-section-title"><i class="fas fa-image"></i> Imagen del Producto</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="id_imagen">* Subir imagen</label>
-                        <div class="file-upload">
-                            <input id="id_imagen" name="imagen" type="file" accept="image/*" required onchange="previewImage(event)">
-                            <div class="file-upload-label">
-                                <i class="fas fa-cloud-upload-alt"></i> 
-                                <span>Click para seleccionar imagen</span>
-                            </div>
-                        </div>
-                        <p class="form-help">Sube una imagen PNG o JPG (Recomendado: 400x400px)</p>
-                    </div>
-                    
-                    <div class="image-preview">
-                        <label>Vista previa</label>
-                        <img id="preview" src="{% static 'img/no-image.png' %}" class="thumb-preview" alt="Preview">
-                        <div class="image-info">
-                            <i class="fas fa-info-circle"></i> La imagen se ajustará automáticamente
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-section">
-                <h3 class="form-section-title"><i class="fas fa-percentage"></i> Configuración de Descuento</h3>
-                <div class="form-group">
-                    <label class="checkbox-label large">
-                        <input id="id_descuento_activo" name="descuento_activo" type="checkbox" onchange="toggleDescuento(this)">
-                        <span class="checkbox-text">Activar descuento para este producto</span>
-                    </label>
-                </div>
-                
-                <div id="wrap_porcentaje" class="form-group descuento-fields" style="display: none;">
-                    <label for="id_porcentaje">Porcentaje de descuento</label>
-                    <div class="descuento-input-group">
-                        <input id="id_porcentaje" name="porcentaje_descuento" type="number" min="0" max="100" value="0">
-                        <span class="input-suffix">%</span>
-                    </div>
-                    
-                    <div class="precio-calculo">
-                        <div class="precio-info">
-                            <span class="precio-label">Precio con descuento:</span>
-                            <span class="precio-valor descuento" id="precioFinal">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-save">
-                    <i class="fas fa-plus-circle"></i> Crear Producto
-                </button>
-                <a href="{% url 'admin_products' %}" class="btn-cancel">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
-            </div>
-        </form>
-    </main>
 
-    <script>
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // Validar tamaño (5MB máximo)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('La imagen es demasiado grande. Máximo 5MB.');
-                    event.target.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        function toggleDescuento(checkbox) {
-            const wrap = document.getElementById('wrap_porcentaje');
-            wrap.style.display = checkbox.checked ? 'block' : 'none';
-            
-            if (checkbox.checked) {
-                calcularDescuento();
-            }
-        }
-        
-        // Calcular descuento en tiempo real
-        function calcularDescuento() {
-            const precio = parseFloat(document.getElementById('id_precio').value) || 0;
-            const porcentaje = parseInt(document.getElementById('id_porcentaje').value) || 0;
-            
-            if (porcentaje > 0 && precio > 0) {
-                const descuento = precio * porcentaje / 100;
-                const precioFinal = precio - descuento;
-                document.getElementById('precioFinal').textContent = `$${precioFinal.toFixed(2)}`;
-            } else {
-                document.getElementById('precioFinal').textContent = `$${precio.toFixed(2)}`;
-            }
-        }
-        
-        // Escuchar cambios en precio y porcentaje
-        document.addEventListener('DOMContentLoaded', function() {
-            const precioInput = document.getElementById('id_precio');
-            const porcentajeInput = document.getElementById('id_porcentaje');
-            
-            if (precioInput) {
-                precioInput.addEventListener('input', calcularDescuento);
-            }
-            if (porcentajeInput) {
-                porcentajeInput.addEventListener('input', calcularDescuento);
-            }
-        });
-        
-        // Validar formulario antes de enviar
-        document.getElementById('productForm').addEventListener('submit', function(e) {
-            const titulo = document.getElementById('id_titulo').value.trim();
-            const precio = document.getElementById('id_precio').value;
-            const unidad = document.getElementById('id_unidad').value;
-            const categoria = document.getElementById('id_categoria').value;
-            const imagen = document.getElementById('id_imagen').value;
-            
-            if (!titulo || !precio || !unidad || !categoria || !imagen) {
-                e.preventDefault();
-                alert('Por favor complete todos los campos obligatorios (*)');
-                return false;
-            }
-            
-            // Validar precio positivo
-            if (parseFloat(precio) <= 0) {
-                e.preventDefault();
-                alert('El precio debe ser mayor a 0');
-                return false;
-            }
-            
-            // Validar porcentaje de descuento si está activo
-            const descuentoActivo = document.getElementById('id_descuento_activo').checked;
-            if (descuentoActivo) {
-                const porcentaje = parseInt(document.getElementById('id_porcentaje').value) || 0;
-                if (porcentaje < 1 || porcentaje > 100) {
-                    e.preventDefault();
-                    alert('El porcentaje de descuento debe estar entre 1 y 100%');
-                    return false;
-                }
-            }
-            
-            return true;
-        });
-    </script>
+            <div class="form-group">
+                <label for="id_categoria"><i class="fas fa-tags"></i> Categoría *</label>
+                <select id="id_categoria" name="categoria" required>
+                    <option value="">Seleccione categoría</option>
+                    <option value="frutas">Frutas</option>
+                    <option value="verduras">Verduras</option>
+                    <option value="otros">Otros</option>
+                </select>
+            </div>
+
+            <!-- ░░ NUEVO CAMPO DESCRIPCIÓN ░░ -->
+            <div class="form-group">
+                <label for="id_descripcion"><i class="fas fa-align-left"></i> Descripción</label>
+                <textarea name="descripcion" class="form-control">{{ producto.descripcion }}</textarea>
+            </div>
+
+            <!-- ░░ NUEVA OPCIÓN FRACCIONADO ░░ -->
+            <div class="form-group">
+                <label class="checkbox-label large">
+                    <input id="id_fraccionado" name="fraccionado" type="checkbox">
+                    <span class="checkbox-text">Permitir ventas por fracciones (½ kg, ¼ kg, etc.)</span>
+                </label>
+                <p class="form-help">Habilitar solo si este producto se vende por kilo.</p>
+            </div>
+        </div>
+
+        <!-- ░░ IMAGEN ░░ -->
+        <div class="form-section">
+            <h3 class="form-section-title"><i class="fas fa-image"></i> Imagen del Producto</h3>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_imagen">* Subir imagen</label>
+                    <div class="file-upload">
+                        <input id="id_imagen" name="imagen" type="file" accept="image/*" required onchange="previewImage(event)">
+                        <div class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click para seleccionar imagen</span>
+                        </div>
+                    </div>
+                    <p class="form-help">Sube una imagen PNG o JPG (Recomendado: 400x400px)</p>
+                </div>
+
+                <div class="image-preview">
+                    <label>Vista previa</label>
+                    <img id="preview" src="{% static 'img/no-image.png' %}" class="thumb-preview">
+                    <div class="image-info">
+                        <i class="fas fa-info-circle"></i> La imagen se ajustará automáticamente
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ░░ DESCUENTOS ░░ -->
+        <div class="form-section">
+            <h3 class="form-section-title"><i class="fas fa-percentage"></i> Configuración de Descuento</h3>
+
+            <div class="form-group">
+                <label class="checkbox-label large">
+                    <input id="id_descuento_activo" name="descuento_activo" type="checkbox"
+                           onchange="toggleDescuento(this)">
+                    <span class="checkbox-text">Activar descuento para este producto</span>
+                </label>
+            </div>
+
+            <div id="wrap_porcentaje" class="form-group descuento-fields" style="display: none;">
+                <label for="id_porcentaje">Porcentaje de descuento</label>
+
+                <div class="descuento-input-group">
+                    <input id="id_porcentaje" name="porcentaje_descuento" type="number"
+                           min="0" max="100" value="0">
+                    <span class="input-suffix">%</span>
+                </div>
+
+                <div class="precio-calculo">
+                    <div class="precio-info">
+                        <span class="precio-label">Precio con descuento:</span>
+                        <span class="precio-valor descuento" id="precioFinal">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ░░ ACCIONES ░░ -->
+        <div class="form-actions">
+            <button type="submit" class="btn-save">
+                <i class="fas fa-plus-circle"></i> Crear Producto
+            </button>
+
+            <a href="{% url 'admin_products' %}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+
+    </form>
+</main>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = e => document.getElementById('preview').src = e.target.result;
+        reader.readAsDataURL(file);
+    }
+}
+
+function toggleDescuento(checkbox) {
+    document.getElementById('wrap_porcentaje').style.display =
+        checkbox.checked ? "block" : "none";
+
+    calcularDescuento();
+}
+
+function calcularDescuento() {
+    const precio = parseFloat(document.getElementById('id_precio').value) || 0;
+    const porcentaje = parseInt(document.getElementById('id_porcentaje').value) || 0;
+
+    if (porcentaje > 0) {
+        const descuento = precio * (porcentaje / 100);
+        const precioFinal = precio - descuento;
+        document.getElementById('precioFinal').textContent = `$${precioFinal.toFixed(2)}`;
+    } else {
+        document.getElementById('precioFinal').textContent = `$${precio.toFixed(2)}`;
+    }
+}
+
+document.getElementById('id_precio').addEventListener('input', calcularDescuento);
+document.getElementById('id_porcentaje').addEventListener('input', calcularDescuento);
+</script>
+
 </body>
 </html>

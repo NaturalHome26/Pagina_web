@@ -9,15 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
     <!-- HEADER -->
     <header class="top-header">
         <div class="logo">NATURAL HOME</div>
         <div class="header-actions">
-            <!-- Botón para administración de productos -->
             <a href="{% url 'admin_products' %}" class="btn-admin">
                 <i class="fas fa-user-cog"></i> Admin
             </a>
-            <!-- Botón del carrito -->
             <button class="btn-cart" id="btnAbrirCarrito">
                 <i class="fas fa-shopping-cart"></i> Carrito <span id="carritoCount">0</span>
             </button>
@@ -34,31 +33,34 @@
             <button class="carrusel-btn prev" onclick="moveCarousel(-1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            
+
             <div class="carrusel-track" id="carruselTrack">
                 {% for p in productos_descuento %}
                 <div class="carrusel-slide">
                     <div class="card-carrusel">
                         <div class="card-carrusel-image">
-                            <!-- BOTÓN DE CARRITO EN ESQUINA SUPERIOR IZQUIERDA - SOLO EN CARRUSEL -->
-                            <button class="btn-add-to-cart-icon" 
+
+                            <!-- Botón agregar al carrito -->
+                            <button class="btn-add-to-cart-icon"
                                     onclick="agregarAlCarrito({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }})">
                                 <i class="fas fa-cart-plus"></i>
                             </button>
-                            <img src="{{ p.imagen.url }}" class="img-producto-carrusel" alt="{{ p.titulo }}" 
-                                 onerror="this.src='{% static 'img/no-image.png' %}'">
+
+                            <img src="{{ p.imagen.url }}" class="img-producto-carrusel"
+                                 alt="{{ p.titulo }}" onerror="this.src='{% static 'img/no-image.png' %}'">
+
                             <div class="badge-descuento-carrusel">-{{ p.porcentaje_descuento }}%</div>
                         </div>
-                        
+
                         <div class="card-carrusel-content">
                             <h4>{{ p.titulo }}</h4>
-                            
+
                             <div class="card-carrusel-pricing">
                                 <div class="pricing-with-discount-carrusel">
                                     <div class="original-price-carrusel">${{ p.precio }}</div>
                                     <div class="current-price-carrusel">${{ p.precio_con_descuento }}</div>
                                 </div>
-                                
+
                                 <div class="product-unit-carrusel">
                                     <span class="unit-badge-carrusel">{{ p.get_unidad_display }}</span>
                                 </div>
@@ -68,15 +70,13 @@
                 </div>
                 {% endfor %}
             </div>
-            
+
             <button class="carrusel-btn next" onclick="moveCarousel(1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
-        
-        <div class="carrusel-dots" id="carruselDots">
-            <!-- Los puntos se generarán con JavaScript -->
-        </div>
+
+        <div class="carrusel-dots" id="carruselDots"></div>
     </div>
     {% endif %}
 
@@ -84,47 +84,66 @@
     <div class="filtros">
         <form method="get" class="search-form" id="searchForm">
             <div class="search-wrapper">
-                <input type="text" name="q" value="{{ query|default_if_none:'' }}" 
-                       id="searchInput" placeholder="Buscar productos..." 
-                       onkeyup="buscarProductos()">
+                <input type="text" name="q" value="{{ query|default_if_none:'' }}"
+                       id="searchInput" placeholder="Buscar productos..." onkeyup="buscarProductos()">
+
                 <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+
                 {% if query %}
-                <a href="{% url 'home' %}" class="search-clear" title="Limpiar búsqueda"><i class="fas fa-times"></i></a>
+                <a href="{% url 'home' %}" class="search-clear" title="Limpiar búsqueda">
+                    <i class="fas fa-times"></i>
+                </a>
                 {% endif %}
             </div>
         </form>
-        
+
         <div class="filter-buttons">
-            <button onclick="filtrar('todas')" class="filter-btn {% if not categoria_actual %}active{% endif %}">Todas</button>
-            <button onclick="filtrar('verduras')" class="filter-btn {% if categoria_actual == 'verduras' %}active{% endif %}">Verduras</button>
-            <button onclick="filtrar('frutas')" class="filter-btn {% if categoria_actual == 'frutas' %}active{% endif %}">Frutas</button>
-            <button onclick="filtrar('otros')" class="filter-btn {% if categoria_actual == 'otros' %}active{% endif %}">Otros</button>
+            <button onclick="filtrar('todas')" class="filter-btn {% if not categoria_actual %}active{% endif %}">
+                Todas
+            </button>
+
+            <button onclick="filtrar('verduras')" class="filter-btn {% if categoria_actual == 'verduras' %}active{% endif %}">
+                Verduras
+            </button>
+
+            <button onclick="filtrar('frutas')" class="filter-btn {% if categoria_actual == 'frutas' %}active{% endif %}">
+                Frutas
+            </button>
+
+            <button onclick="filtrar('otros')" class="filter-btn {% if categoria_actual == 'otros' %}active{% endif %}">
+                Otros
+            </button>
         </div>
     </div>
 
-    <!-- Información de resultados -->
     {% if query %}
     <div class="search-results-info">
         <p>Resultados para: "<strong>{{ query }}</strong>"</p>
         <a href="{% url 'home' %}" class="clear-search-link">Ver todos los productos</a>
     </div>
     {% endif %}
-
-    <!-- GRID DE PRODUCTOS CON IMÁGENES AJUSTADAS (MÁS PEQUEÑAS) -->
+    <!-- GRID DE PRODUCTOS -->
     <div class="grid-productos" id="productosContainer">
         {% for p in productos %}
-        <div class="card" data-categoria="{{ p.categoria }}" data-nombre="{{ p.titulo|lower }}">
+        <div class="card"
+             data-categoria="{{ p.categoria }}"
+             data-nombre="{{ p.titulo|lower }}"
+             onclick="abrirProducto({{ p.id }})">
+
             <div class="card-image">
-                <img src="{{ p.imagen.url }}" class="img-producto" alt="{{ p.titulo }}" 
+                <img src="{{ p.imagen.url }}"
+                     class="img-producto"
+                     alt="{{ p.titulo }}"
                      onerror="this.src='{% static 'img/no-image.png' %}'">
+
                 {% if p.descuento_activo %}
                 <div class="badge-descuento">-{{ p.porcentaje_descuento }}%</div>
                 {% endif %}
             </div>
-            
+
             <div class="card-content">
                 <h3>{{ p.titulo }}</h3>
-                
+
                 <div class="card-pricing">
                     {% if p.descuento_activo %}
                     <div class="pricing-with-discount">
@@ -134,18 +153,19 @@
                     {% else %}
                     <div class="normal-price">${{ p.precio }}</div>
                     {% endif %}
-                    
+
                     <div class="product-unit">
                         <span class="unit-badge">{{ p.get_unidad_display }}</span>
                     </div>
                 </div>
-                
-                <!-- BOTÓN DE AGREGAR AL CARRITO PARA GRID NORMAL (se mantiene el original) -->
-                <button onclick="agregarAlCarrito({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }})" 
+
+                <!-- Botón carrito (se mantiene, no interfiere con onclick del modal) -->
+                <button onclick="event.stopPropagation(); agregarAlCarrito({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }})"
                         class="add-to-cart-btn">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
+
         </div>
         {% empty %}
         <div class="empty-state">
@@ -153,6 +173,7 @@
                 <i class="fas fa-box-open"></i>
             </div>
             <p>No hay productos disponibles{% if query %} que coincidan con tu búsqueda{% endif %}.</p>
+
             {% if query %}
             <a href="{% url 'home' %}" class="btn-save">Ver todos los productos</a>
             {% endif %}
@@ -160,22 +181,26 @@
         {% endfor %}
     </div>
 
-    <!-- Paginación -->
+    <!-- PAGINACIÓN -->
     {% if productos.paginator.num_pages > 1 %}
     <div class="pagination shop-pagination">
         <div class="pagination-info">
             Página {{ productos.number }} de {{ productos.paginator.num_pages }}
         </div>
-        
+
         <div class="pagination-controls">
             {% if productos.has_previous %}
-            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn"><i class="fas fa-angle-double-left"></i></a>
-            <a href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn"><i class="fas fa-angle-left"></i></a>
+            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <a href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn">
+                <i class="fas fa-angle-left"></i>
+            </a>
             {% else %}
             <span class="pagination-btn disabled"><i class="fas fa-angle-double-left"></i></span>
             <span class="pagination-btn disabled"><i class="fas fa-angle-left"></i></span>
             {% endif %}
-            
+
             <div class="pagination-numbers">
                 {% for num in productos.paginator.page_range %}
                     {% if productos.number == num %}
@@ -185,10 +210,14 @@
                     {% endif %}
                 {% endfor %}
             </div>
-            
+
             {% if productos.has_next %}
-            <a href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn"><i class="fas fa-angle-right"></i></a>
-            <a href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn"><i class="fas fa-angle-double-right"></i></a>
+            <a href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
             {% else %}
             <span class="pagination-btn disabled"><i class="fas fa-angle-right"></i></span>
             <span class="pagination-btn disabled"><i class="fas fa-angle-double-right"></i></span>
@@ -197,23 +226,23 @@
     </div>
     {% endif %}
 
-    <!-- MODAL CARRITO -->
+    <!-- MODAL DEL CARRITO -->
     <div id="modalCarrito" class="modal">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
                 <button class="btn-cerrar" onclick="cerrarCarrito()"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <div id="listaCarrito" class="lista-carrito">
-                <!-- Los items del carrito se insertarán aquí -->
+                <!-- Items del carrito -->
             </div>
-            
+
             <div class="total-carrito">
                 <span class="total-label">Total:</span>
                 <span id="totalCarrito" class="total-amount">$0</span>
             </div>
-            
+
             <div class="modal-footer">
                 <button class="btn-send"><i class="fas fa-truck"></i> Completar Datos de Envío</button>
                 <button class="btn-cancelar" onclick="cerrarCarrito()">Seguir Comprando</button>
@@ -221,45 +250,84 @@
         </div>
     </div>
 
+    <!-- MODAL DETALLE PRODUCTO -->
+    <div id="modalProducto" class="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+
+            <div class="modal-header">
+                <h2 id="modalProductoTitulo"></h2>
+                <button class="btn-cerrar" onclick="cerrarProducto()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-product-body">
+                <img id="modalProductoImagen" class="modal-product-img" src="" alt="Producto">
+
+                <p id="modalProductoDescripcion" class="modal-product-description"></p>
+
+                <div class="modal-product-pricing">
+                    <span id="modalProductoPrecio" class="modal-product-price"></span>
+                    <span id="modalProductoUnidad" class="modal-product-unit"></span>
+                </div>
+
+                <!-- Selector de cantidad -->
+                <div class="modal-cantidad-wrapper">
+                    <label for="modalProductoCantidad">Cantidad:</label>
+                    <input id="modalProductoCantidad" type="number" min="1" value="1000" step="50">
+                    <span id="modalUnidadTexto">g</span>
+                </div>
+
+                <!-- Botón agregar -->
+                <button id="modalProductoAgregar"
+                        class="btn-cart"
+                        onclick="">
+                    <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                </button>
+            </div>
+
+        </div>
+    </div>
     <script src="{% static 'js/app.js' %}"></script>
+
     <script>
-        // Variables para el carrusel
-        let currentSlide = 0;
-        let autoSlideInterval;
-        const slidesToShow = 4; // Cantidad de slides visibles en el carrusel
-        
-        // Inicializar el carrito cuando la página carga
+        /* =========================================================
+           INICIALIZACIÓN GENERAL
+        ========================================================= */
         document.addEventListener('DOMContentLoaded', function() {
-            // Configurar el botón del carrito
-            document.getElementById('btnAbrirCarrito').addEventListener('click', abrirCarrito);
-            
-            // Inicializar el carrito desde localStorage
+
+            // Botón abrir carrito
+            document.getElementById('btnAbrirCarrito')
+                .addEventListener('click', abrirCarrito);
+
+            // Inicializar carrito desde localStorage
             actualizarContador();
-            
-            // Configurar el modal para cerrar al hacer clic fuera
-            document.getElementById('modalCarrito').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    cerrarCarrito();
-                }
-            });
-            
-            // Configurar filtros
+
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('modalCarrito')
+                .addEventListener('click', function(e) {
+                    if (e.target === this) cerrarCarrito();
+                });
+
+            // Cerrar modal producto al hacer clic fuera
+            document.getElementById('modalProducto')
+                .addEventListener('click', function(e) {
+                    if (e.target === this) cerrarProducto();
+                });
+
             setupFilters();
-            
-            // Inicializar carrusel si existe
             initCarousel();
         });
-        
+
+        /* =========================================================
+           FILTROS
+        ========================================================= */
         function setupFilters() {
-            // Actualizar filtros activos basados en URL
             const urlParams = new URLSearchParams(window.location.search);
             const categoria = urlParams.get('categoria');
-            
-            // Marcar botón activo
+
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             if (categoria) {
                 const activeBtn = document.querySelector(`.filter-btn[onclick*="${categoria}"]`);
                 if (activeBtn) activeBtn.classList.add('active');
@@ -268,184 +336,126 @@
                 if (allBtn) allBtn.classList.add('active');
             }
         }
-        
+
         function filtrar(categoria) {
             const url = new URL(window.location);
-            
+
             if (categoria === 'todas') {
                 url.searchParams.delete('categoria');
             } else {
                 url.searchParams.set('categoria', categoria);
             }
-            
-            // Mantener búsqueda si existe
+
             const searchInput = document.getElementById('searchInput');
-            if (searchInput && searchInput.value) {
+            if (searchInput.value) {
                 url.searchParams.set('q', searchInput.value);
             }
-            
-            // Ir a primera página al filtrar
-            url.searchParams.delete('page');
-            
+
             window.location.href = url.toString();
         }
-        
-        // Sobreescribir buscarProductos para usar búsqueda del servidor
-        function buscarProductos() {
-            const texto = document.getElementById('searchInput').value.toLowerCase();
-            
-            // Si hay búsqueda del servidor, dejar que maneje
-            if (texto.length >= 2) {
-                // Actualizar URL después de 500ms de inactividad
-                clearTimeout(window.searchTimeout);
-                window.searchTimeout = setTimeout(() => {
-                    const form = document.getElementById('searchForm');
-                    form.submit();
-                }, 500);
-            } else if (texto.length === 0) {
-                // Si se limpia la búsqueda, recargar sin parámetros
-                clearTimeout(window.searchTimeout);
-                window.searchTimeout = setTimeout(() => {
-                    window.location.href = "{% url 'home' %}";
-                }, 300);
-            }
-        }
-        
-        // Funciones del carrusel
+
+        /* =========================================================
+           CARRUSEL DE DESCUENTOS
+        ========================================================= */
+
+        let currentSlide = 0;
+        const slidesToShow = 4;
+
         function initCarousel() {
-            const carrusel = document.querySelector('.carrusel-descuentos');
-            if (!carrusel) return;
-            
             const track = document.getElementById('carruselTrack');
-            const slides = document.querySelectorAll('.carrusel-slide');
+            if (!track) return;
+
+            const slides = track.children;
+            const total = slides.length;
+
             const dotsContainer = document.getElementById('carruselDots');
-            
-            if (!track || slides.length === 0) return;
-            
-            // Crear puntos de navegación
-            const totalSlides = slides.length;
-            const totalDots = Math.ceil(totalSlides / slidesToShow);
-            
-            dotsContainer.innerHTML = '';
-            for (let i = 0; i < totalDots; i++) {
-                const dot = document.createElement('button');
-                dot.className = 'carrusel-dot';
-                if (i === 0) dot.classList.add('active');
-                dot.setAttribute('data-index', i);
-                dot.innerHTML = '●';
-                dot.addEventListener('click', () => goToSlide(i * slidesToShow));
-                dotsContainer.appendChild(dot);
-            }
-            
-            // Ajustar el ancho del track
-            updateCarousel();
-            
-            // Auto deslizar cada 5 segundos
-            startAutoSlide();
-            
-            // Pausar auto slide al hacer hover
-            carrusel.addEventListener('mouseenter', stopAutoSlide);
-            carrusel.addEventListener('mouseleave', startAutoSlide);
-            
-            // Actualizar en redimensionamiento
-            window.addEventListener('resize', updateCarousel);
-        }
-        
-        function updateCarousel() {
-            const track = document.getElementById('carruselTrack');
-            const slides = document.querySelectorAll('.carrusel-slide');
-            
-            if (!track || slides.length === 0) return;
-            
-            // Calcular slides visibles según el ancho de la pantalla
-            let visibleSlides = slidesToShow;
-            if (window.innerWidth < 768) {
-                visibleSlides = 1;
-            } else if (window.innerWidth < 1024) {
-                visibleSlides = 2;
-            } else if (window.innerWidth < 1200) {
-                visibleSlides = 3;
-            }
-            
-            // Ajustar el ancho del track y de los slides
-            const slideWidth = 100 / visibleSlides;
-            track.style.width = `${slides.length * slideWidth}%`;
-            
-            slides.forEach(slide => {
-                slide.style.width = `${slideWidth}%`;
-            });
-            
-            // Actualizar posición
-            moveCarousel(0, true);
-        }
-        
-        function moveCarousel(direction, forceUpdate = false) {
-            const track = document.getElementById('carruselTrack');
-            const slides = document.querySelectorAll('.carrusel-slide');
-            const dots = document.querySelectorAll('.carrusel-dot');
-            
-            if (!track || slides.length === 0) return;
-            
-            // Calcular slides visibles según el ancho de la pantalla
-            let visibleSlides = slidesToShow;
-            if (window.innerWidth < 768) {
-                visibleSlides = 1;
-            } else if (window.innerWidth < 1024) {
-                visibleSlides = 2;
-            } else if (window.innerWidth < 1200) {
-                visibleSlides = 3;
-            }
-            
-            const totalSlides = slides.length;
-            const maxSlide = Math.max(0, totalSlides - visibleSlides);
-            
-            if (!forceUpdate) {
-                currentSlide += direction;
-                
-                // Limitar rango
-                if (currentSlide < 0) {
-                    currentSlide = maxSlide;
-                } else if (currentSlide > maxSlide) {
-                    currentSlide = 0;
+            if (dotsContainer) {
+                dotsContainer.innerHTML = "";
+                for (let i = 0; i < Math.ceil(total / slidesToShow); i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => goToSlide(i));
+                    dotsContainer.appendChild(dot);
                 }
             }
-            
-            // Calcular desplazamiento
-            const slideWidth = 100 / visibleSlides;
-            const translateX = -currentSlide * slideWidth;
-            track.style.transform = `translateX(${translateX}%)`;
-            
-            // Actualizar puntos activos
-            const activeDotIndex = Math.floor(currentSlide / visibleSlides);
+        }
+
+        function moveCarousel(direction) {
+            const track = document.getElementById('carruselTrack');
+            const slides = track.children;
+
+            const totalGroups = Math.ceil(slides.length / slidesToShow);
+
+            currentSlide += direction;
+
+            if (currentSlide < 0) currentSlide = totalGroups - 1;
+            if (currentSlide >= totalGroups) currentSlide = 0;
+
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            updateDots();
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            const track = document.getElementById('carruselTrack');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('#carruselDots .dot');
             dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === activeDotIndex);
+                dot.classList.toggle('active', index === currentSlide);
             });
-            
-            // Reiniciar auto slide
-            if (!forceUpdate) {
-                stopAutoSlide();
-                startAutoSlide();
-            }
         }
-        
-        function goToSlide(index) {
-            currentSlide = index;
-            moveCarousel(0, true);
+
+        /* =========================================================
+           MODAL DE PRODUCTO
+        ========================================================= */
+        function abrirProducto(id) {
+
+            fetch(`/api/producto/${id}/`)
+                .then(res => res.json())
+                .then(p => {
+
+                    document.getElementById('modalProductoTitulo').textContent = p.titulo;
+                    document.getElementById('modalProductoImagen').src = p.imagen;
+                    document.getElementById('modalProductoDescripcion').textContent = p.descripcion;
+                    document.getElementById('modalProductoPrecio').textContent = "$" + p.precio_final;
+                    document.getElementById('modalProductoUnidad').textContent = p.unidad_display;
+
+                    // Selector de cantidad
+                    const select = document.getElementById('modalProductoCantidad');
+                    select.innerHTML = "";
+
+                    if (p.fraccionado && p.unidad === "kg") {
+                        select.innerHTML += `<option value="0.25">¼ kg</option>`;
+                        select.innerHTML += `<option value="0.5">½ kg</option>`;
+                        select.innerHTML += `<option value="1">1 kg</option>`;
+                        select.innerHTML += `<option value="2">2 kg</option>`;
+                    } else {
+                        select.innerHTML += `<option value="1">1</option>`;
+                        select.innerHTML += `<option value="2">2</option>`;
+                        select.innerHTML += `<option value="3">3</option>`;
+                    }
+
+                    // Setup handler agregar al carrito
+                    document.getElementById('modalProductoAgregar').onclick = function() {
+                        agregarAlCarrito(p.id, p.titulo, p.precio_final, select.value);
+                    };
+
+                    // Mostrar modal
+                    document.getElementById('modalProducto').style.display = "flex";
+                });
         }
-        
-        function startAutoSlide() {
-            stopAutoSlide(); // Detener cualquier intervalo existente
-            autoSlideInterval = setInterval(() => {
-                moveCarousel(1);
-            }, 5000); // Cambiar cada 5 segundos
+
+        function cerrarProducto() {
+            document.getElementById('modalProducto').style.display = "none";
         }
-        
-        function stopAutoSlide() {
-            if (autoSlideInterval) {
-                clearInterval(autoSlideInterval);
-                autoSlideInterval = null;
-            }
-        }
+
     </script>
+
 </body>
 </html>
