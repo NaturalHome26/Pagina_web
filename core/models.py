@@ -10,6 +10,8 @@ class Producto(models.Model):
     CATEGORIAS = [
         ("frutas", "Frutas"),
         ("verduras", "Verduras"),
+        ("canastas", "Canastas"),
+        ("combos", "Combos"),
         ("otros", "Otros"),
     ]
 

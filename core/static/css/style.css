@@ -1350,7 +1350,9 @@ body {
     max-width: 1200px;
 }
 
-/* === MODAL CARRITO === */
+/* ================================
+   MODAL CARRITO - DISEÑO COMPLETO
+   ================================ */
 .modal {
     display: none;
     position: fixed;
@@ -1447,7 +1449,27 @@ body {
     max-height: 400px;
 }
 
-.item-carrito {
+/* ESTADO VACÍO DEL CARRITO */
+.carrito-vacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    display: none;
+}
+
+.carrito-vacio-icon {
+    font-size: 60px;
+    color: #d0e7d6;
+    margin-bottom: 20px;
+}
+
+.carrito-vacio p {
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+/* ITEM DEL CARRITO - DISEÑO MEJORADO */
+.carrito-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1459,72 +1481,111 @@ body {
     transition: all 0.3s;
 }
 
-.item-carrito:hover {
+.carrito-item:hover {
     border-color: #12b84e;
     transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(18, 184, 78, 0.1);
 }
 
-.item-carrito-info h4 {
+.carrito-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.carrito-info h4 {
     margin: 0 0 8px 0;
     color: #0b2e13;
     font-size: 16px;
     font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.item-carrito-info p {
-    margin: 0;
+.carrito-info h4 .producto-id {
+    font-size: 12px;
+    color: #666;
+    background: #e8f5e9;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.carrito-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.carrito-details .cantidad-badge {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 2px solid #bbdefb;
+}
+
+.carrito-details .precio-unit {
     color: #666;
     font-size: 14px;
 }
 
-.item-carrito-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.carrito-details .precio-unit span {
+    color: #1f8e3c;
+    font-weight: 700;
 }
 
-.btn-cantidad {
-    background: white;
-    border: 2px solid #d0e7d6;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+.carrito-subtotal {
+    font-weight: 700;
+    color: #0b2e13;
+    font-size: 16px;
+}
+
+.carrito-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.carrito-actions button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: #1f8e3c;
-    font-size: 16px;
     transition: all 0.3s;
     -webkit-tap-highlight-color: transparent;
 }
 
-.btn-cantidad:hover {
+.carrito-actions button:not(.btn-remove) {
+    background: white;
+    border: 2px solid #d0e7d6;
+    color: #1f8e3c;
+    font-size: 16px;
+}
+
+.carrito-actions button:not(.btn-remove):hover {
     background: #e8f5e9;
     border-color: #12b84e;
     transform: scale(1.1);
 }
 
-.btn-eliminar {
+.btn-remove {
     background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
     color: #c62828;
-    border: none;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
+    border: 2px solid #ffcdd2 !important;
     font-size: 14px;
-    transition: all 0.3s;
-    border: 2px solid #ffcdd2;
-    -webkit-tap-highlight-color: transparent;
 }
 
-.btn-eliminar:hover {
+.btn-remove:hover {
     background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
     transform: scale(1.1);
 }
@@ -1916,6 +1977,26 @@ body {
     .pagination-numbers {
         order: -1;
     }
+    
+    /* Carrrito responsive */
+    .carrito-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .carrito-info h4 {
+        justify-content: center;
+    }
+    
+    .carrito-details {
+        justify-content: center;
+    }
+    
+    .carrito-actions {
+        justify-content: center;
+    }
 }
 
 /* Para móviles pequeños (menos de 576px) */
@@ -1982,6 +2063,26 @@ body {
         height: 28px;
         font-size: 14px;
     }
+    
+    /* Carrito responsive */
+    .modal-content {
+        width: 95%;
+    }
+    
+    .modal-header {
+        padding: 20px;
+    }
+    
+    .lista-carrito {
+        padding: 20px;
+    }
+    
+    .total-carrito {
+        padding: 20px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
 }
 
 /* Para pantallas muy pequeñas (menos de 400px) */
@@ -2031,18 +2132,6 @@ body {
     
     .modal-header h2 {
         font-size: 20px;
-    }
-    
-    .item-carrito {
-        padding: 15px;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-    
-    .item-carrito-actions {
-        width: 100%;
-        justify-content: center;
     }
 }
 
@@ -2094,88 +2183,382 @@ img {
     box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
 }
 
-/* Contenedor del modal */
-.modal-content {
+/* ================================
+   MODAL DE PRODUCTO - NATURAL HOME
+   ================================ */
+
+/* Contenedor del modal de producto */
+#modalProducto .modal-content {
     padding: 0;
     border-radius: 20px;
     overflow: hidden;
-    max-width: 620px;
+    max-width: 600px;
     width: 95%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Título */
 #modalProductoTitulo {
-    font-size: 28px;
-    font-weight: bold;
-    text-align: center;
-    margin: 0;
+    font-size: 26px;
     padding: 18px;
-    background-color: #23a455;
-    color: white;
+    margin: 0;
+    background: #23a455;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Cuerpo del modal */
+#modalProducto .modal-product-body {
+    padding-top: 10px;
+    padding-bottom: 25px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
 }
 
 /* Imagen del producto */
 #modalProductoImagen {
     width: 100%;
-    height: auto;
+    max-height: 280px;
     object-fit: contain;
+    display: block;
     margin: 0 auto;
+    background: #fff;
+    padding: 10px 0;
 }
 
 /* Descripción */
-.modal-product-description {
-    font-size: 17px;
-    color: #444;
+#modalProducto .modal-product-description {
+    padding: 0 35px;
+    margin-top: 15px;
+    margin-bottom: 20px;
     text-align: center;
-    padding: 10px 30px;
+    white-space: pre-line;
+    font-size: 16px;
+    color: #444;
     line-height: 1.5;
+}
+
+/* Precio + unidad */
+#modalProducto .modal-price-wrapper {
+    text-align: center;
     margin-bottom: 20px;
 }
 
-/* Precio + Unidad */
-.modal-price-wrapper {
-    text-align: center;
-    margin: 5px 0 20px;
+#modalProducto #modalProductoPrecio {
+    font-size: 26px;
+    font-weight: 700;
+    color: #333;
+    margin-right: 6px;
 }
 
-.modal-price-wrapper span {
-    font-size: 22px;
-    font-weight: bold;
+#modalProducto #modalProductoUnidad {
+    font-size: 16px;
+    opacity: 0.7;
 }
 
 /* Cantidad */
-.modal-cantidad-wrapper {
+#modalProducto .modal-cantidad-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
-    font-size: 17px;
-    margin-bottom: 20px;
+    font-size: 18px;
+    margin-bottom: 25px;
 }
 
-.modal-cantidad-wrapper input[type="number"] {
-    width: 110px;
-    padding: 6px 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-/* Botón agregar */
-#modalProductoAgregar {
-    display: block;
-    margin: 0 auto 25px;
-    padding: 10px 25px;
-    background-color: #ffb74d;
-    border: none;
-    border-radius: 10px;
+#modalProducto .cantidad-input-box {
     display: flex;
     align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #fff;
+}
+
+#modalProducto .cantidad-input-box input {
+    width: 90px;
+    border: none;
+    outline: none;
+    text-align: right;
+    font-size: 17px;
+}
+
+#modalProducto .cantidad-input-box span {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+/* Botón agregar al carrito */
+#modalProducto #modalProductoAgregar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
+    background: #ffb74d;
+    border: none;
+    padding: 12px 25px;
+    margin: 0 auto;
+    margin-bottom: 5px;
+    border-radius: 10px;
     font-size: 17px;
     cursor: pointer;
 }
 
-#modalProductoAgregar:hover {
-    background-color: #ffa726;
+#modalProducto #modalProductoAgregar:hover {
+    background: #ffa726;
+}
+
+/* NOTIFICACIONES */
+.notificacion {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(31, 142, 60, 0.3);
+    z-index: 3000;
+    animation: slideInRight 0.3s ease;
+    max-width: 300px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ==========================================
+   FIX MODAL PRODUCTO (scroll + layout limpio)
+   Pegar al FINAL de style.css
+========================================== */
+
+/* El contenedor del modal NO debe scrollear; scrollea el body */
+.modal-content{
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* clave: evita que se "corte" sin scroll */
+}
+
+/* El body del modal es el que scrollea */
+.modal-body{
+  flex: 1;
+  overflow-y: auto; /* scroll acá */
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Imagen: estaba enorme y genera sensación de "caja vacía" */
+.modal-product-image-container{
+  width: 100%;
+  height: 170px;              /* antes te quedaba gigante */
+  background: #f8fdf9;
+  border-radius: 12px;
+  border: 2px solid #e0f2e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.modal-product-image-container img{
+  width: 100%;
+  height: 100%;
+  max-height: 150px;
+  object-fit: contain;
+}
+
+/* Cajas: menos padding para que no se vea inflado */
+.modal-product-description-container,
+.modal-price-section,
+.modal-cantidad-section{
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #e0f2e7;
+  padding: 14px;
+}
+
+/* Título de descripción */
+.modal-product-description-title{
+  font-weight: 800;
+  color: #1f8e3c;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-product-description-container p{
+  font-size: 14px;
+  line-height: 1.4;
+  color: #444;
+}
+
+/* Sección precio */
+.price-label{
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.price-value{
+  font-size: 26px;
+  font-weight: 800;
+  color: #1f8e3c;
+}
+
+.unit-badge-modal{
+  margin-left: 10px;
+  padding: 4px 10px;
+  background: #e8f5e9;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Cantidad */
+.cantidad-label{
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #0b2e13;
+}
+
+.cantidad-controls{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cantidad-input-wrapper{
+  position: relative;
+}
+
+.cantidad-input-wrapper input{
+  width: 100%;
+  padding: 12px 52px 12px 12px;
+  border-radius: 10px;
+  border: 2px solid #d0e7d6;
+  font-size: 16px;
+}
+
+.cantidad-input-suffix{
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  color: #666;
+}
+
+.cantidad-buttons{
+  display: flex;
+  gap: 10px;
+}
+
+.btn-cantidad{
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #1f8e3c;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-cantidad:hover{
+  background: #0f9c40;
+}
+
+.cantidad-presets{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cantidad-presets button{
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid #d0e7d6;
+  background: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cantidad-presets button.active{
+  background: #1f8e3c;
+  color: white;
+  border-color: #1f8e3c;
+}
+
+/* Móviles / pantallas bajas: aún más compacto */
+@media (max-height: 700px){
+  .modal-product-image-container{ height: 140px; }
+  .modal-body{ padding: 14px 18px; }
+}
+
+/* ===== CANTIDAD EN UNA SOLA LÍNEA ===== */
+
+.cantidad-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Fila principal: - input + */
+.cantidad-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botones + / - compactos */
+.btn-cantidad {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 10px;
+    border: none;
+    background: #1f8e3c;
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cantidad:hover {
+    background: #0f9c40;
+}
+
+/* Input ocupa el centro */
+.cantidad-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.cantidad-input-wrapper input {
+    width: 100%;
+    height: 42px;
+    padding: 0 42px 0 12px;
+    border-radius: 10px;
+    border: 2px solid #d0e7d6;
+    font-size: 16px;
+    text-align: left;
+}
+
+/* sufijo g / kg */
+.cantidad-input-suffix {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    color: #666;
 }

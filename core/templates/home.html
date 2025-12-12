@@ -36,13 +36,18 @@
 
             <div class="carrusel-track" id="carruselTrack">
                 {% for p in productos_descuento %}
-                <div class="carrusel-slide">
+                <div class="carrusel-slide"
+                     data-id="{{ p.id }}"
+                     data-nombre="{{ p.titulo|escapejs }}"
+                     data-precio="{{ p.precio_con_descuento }}"
+                     data-fraccionado="{{ p.fraccionado|yesno:'true,false' }}"
+                     data-unidad="{{ p.unidad }}">
                     <div class="card-carrusel">
                         <div class="card-carrusel-image">
 
                             <!-- Botón agregar al carrito -->
                             <button class="btn-add-to-cart-icon"
-                                    onclick="agregarAlCarrito({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }})">
+                                    onclick="event.stopPropagation(); agregarDesdeTarjeta({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }}, {{ p.fraccionado|yesno:'true,false' }}, '{{ p.unidad }}')">
                                 <i class="fas fa-cart-plus"></i>
                             </button>
 
@@ -122,19 +127,23 @@
         <a href="{% url 'home' %}" class="clear-search-link">Ver todos los productos</a>
     </div>
     {% endif %}
-    <!-- GRID DE PRODUCTOS -->
+        <!-- GRID DE PRODUCTOS -->
     <div class="grid-productos" id="productosContainer">
         {% for p in productos %}
         <div class="card"
-             data-categoria="{{ p.categoria }}"
-             data-nombre="{{ p.titulo|lower }}"
-             onclick="abrirProducto({{ p.id }})">
+            data-id="{{ p.id }}"
+            data-categoria="{{ p.categoria }}"
+            data-nombre="{{ p.titulo|lower }}"
+            data-precio="{{ p.precio_con_descuento }}"
+            data-fraccionado="{{ p.fraccionado|yesno:'true,false' }}"
+            data-unidad="{{ p.unidad }}"
+            onclick="abrirProducto({{ p.id }})">
 
             <div class="card-image">
                 <img src="{{ p.imagen.url }}"
-                     class="img-producto"
-                     alt="{{ p.titulo }}"
-                     onerror="this.src='{% static 'img/no-image.png' %}'">
+                    class="img-producto"
+                    alt="{{ p.titulo }}"
+                    onerror="this.src='{% static 'img/no-image.png' %}'">
 
                 {% if p.descuento_activo %}
                 <div class="badge-descuento">-{{ p.porcentaje_descuento }}%</div>
@@ -160,13 +169,14 @@
                 </div>
 
                 <!-- Botón carrito (se mantiene, no interfiere con onclick del modal) -->
-                <button onclick="event.stopPropagation(); agregarAlCarrito({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }})"
+                <button onclick="event.stopPropagation(); agregarDesdeTarjetaDesdeBoton(this)"
                         class="add-to-cart-btn">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
 
         </div>
+        
         {% empty %}
         <div class="empty-state">
             <div class="empty-icon">
@@ -250,42 +260,90 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE PRODUCTO -->
+    <!-- MODAL DETALLE PRODUCTO (VERSIÓN CORREGIDA) -->
     <div id="modalProducto" class="modal">
         <div class="modal-content" onclick="event.stopPropagation()">
 
+            <!-- Header con gradiente verde -->
             <div class="modal-header">
                 <h2 id="modalProductoTitulo"></h2>
                 <button class="btn-cerrar" onclick="cerrarProducto()"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="modal-product-body">
-                <img id="modalProductoImagen" class="modal-product-img" src="" alt="Producto">
-
-                <p id="modalProductoDescripcion" class="modal-product-description"></p>
-
-                <div class="modal-product-pricing">
-                    <span id="modalProductoPrecio" class="modal-product-price"></span>
-                    <span id="modalProductoUnidad" class="modal-product-unit"></span>
+            <div class="modal-body">
+                <!-- Contenedor de imagen -->
+                <div class="modal-product-image-container">
+                    <img id="modalProductoImagen" src="" alt="Producto">
                 </div>
 
-                <!-- Selector de cantidad -->
-                <div class="modal-cantidad-wrapper">
-                    <label for="modalProductoCantidad">Cantidad:</label>
-                    <input id="modalProductoCantidad" type="number" min="1" value="1000" step="50">
-                    <span id="modalUnidadTexto">g</span>
+                <!-- Contenedor de descripción -->
+                <div class="modal-product-description-container">
+                    <div class="modal-product-description-title">
+                        <i class="fas fa-info-circle"></i> Descripción
+                    </div>
+                    <p id="modalProductoDescripcion"></p>
                 </div>
 
-                <!-- Botón agregar -->
-                <button id="modalProductoAgregar"
-                        class="btn-cart"
-                        onclick="">
+                <!-- Contenedor de información (precio + cantidad) -->
+                <div class="modal-product-info-container">
+                    <!-- Precio -->
+                    <div class="modal-price-section">
+                        <div class="price-label">
+                            <i class="fas fa-tag"></i> Precio
+                        </div>
+                        <div class="price-value">
+                            <span id="modalProductoPrecio"></span>
+                            <div class="price-unit">
+                                <span id="modalProductoUnidad"></span>
+                                <span class="unit-badge-modal" id="modalUnidadBadge"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cantidad - AHORA CON UNA SOLA ESTRUCTURA MÁS FLEXIBLE -->
+                    <div class="modal-cantidad-section">
+                        <div class="cantidad-label">
+                            <i class="fas fa-balance-scale"></i> 
+                            <span id="cantidadLabelText">Cantidad</span>
+                        </div>
+                        
+                        <div class="cantidad-controls">
+                            <!-- Grupo de input con sufijo dinámico -->
+                            <div class="cantidad-input-group">
+                                <div class="cantidad-input-wrapper">
+                                    <input id="modalProductoCantidad" type="number" min="1" value="1">
+                                    <span class="cantidad-input-suffix" id="modalUnidadSuffix">unidad</span>
+                                </div>
+                                
+                                <div class="cantidad-buttons">
+                                    <button class="btn-cantidad" onclick="ajustarCantidad(-1)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button class="btn-cantidad" onclick="ajustarCantidad(1)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Predefinidos dinámicos -->
+                            <div class="cantidad-presets" id="cantidadPresets">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer del modal -->
+            <div class="modal-footer">
+                <button id="modalProductoAgregar" class="btn-send">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
 
         </div>
     </div>
+
     <script src="{% static 'js/app.js' %}"></script>
 
     <script>
@@ -412,47 +470,282 @@
         }
 
         /* =========================================================
-           MODAL DE PRODUCTO
+           MODAL DE PRODUCTO - VERSIÓN CORREGIDA
         ========================================================= */
+        
+        let productoActual = null;
+        let esFraccionado = false;
+        let unidadProducto = '';
+        
         function abrirProducto(id) {
-
             fetch(`/api/producto/${id}/`)
                 .then(res => res.json())
                 .then(p => {
-
+                    productoActual = p;
+                    esFraccionado = (p.fraccionado === true && p.unidad === "kg");
+                    unidadProducto = p.unidad;
+                    
+                    // Configurar título
                     document.getElementById('modalProductoTitulo').textContent = p.titulo;
-                    document.getElementById('modalProductoImagen').src = p.imagen;
-                    document.getElementById('modalProductoDescripcion').textContent = p.descripcion;
-                    document.getElementById('modalProductoPrecio').textContent = "$" + p.precio_final;
-                    document.getElementById('modalProductoUnidad').textContent = p.unidad_display;
-
-                    // Selector de cantidad
-                    const select = document.getElementById('modalProductoCantidad');
-                    select.innerHTML = "";
-
-                    if (p.fraccionado && p.unidad === "kg") {
-                        select.innerHTML += `<option value="0.25">¼ kg</option>`;
-                        select.innerHTML += `<option value="0.5">½ kg</option>`;
-                        select.innerHTML += `<option value="1">1 kg</option>`;
-                        select.innerHTML += `<option value="2">2 kg</option>`;
-                    } else {
-                        select.innerHTML += `<option value="1">1</option>`;
-                        select.innerHTML += `<option value="2">2</option>`;
-                        select.innerHTML += `<option value="3">3</option>`;
-                    }
-
-                    // Setup handler agregar al carrito
-                    document.getElementById('modalProductoAgregar').onclick = function() {
-                        agregarAlCarrito(p.id, p.titulo, p.precio_final, select.value);
+                    
+                    // Configurar imagen
+                    const img = document.getElementById('modalProductoImagen');
+                    img.src = p.imagen;
+                    img.alt = p.titulo;
+                    img.onerror = function() {
+                        this.src = '{% static "img/no-image.png" %}';
                     };
-
+                    
+                    // Configurar descripción
+                    const descEl = document.getElementById('modalProductoDescripcion');
+                    if (p.descripcion && p.descripcion.trim() !== '') {
+                        descEl.textContent = p.descripcion;
+                    } else {
+                        descEl.textContent = "Sin descripción disponible.";
+                    }
+                    
+                    // Configurar precio
+                    const precioEl = document.getElementById('modalProductoPrecio');
+                    precioEl.textContent = "$" + p.precio_final;
+                    
+                    // Configurar unidad
+                    const unidadEl = document.getElementById('modalProductoUnidad');
+                    const unidadBadge = document.getElementById('modalUnidadBadge');
+                    
+                    if (esFraccionado) {
+                        // PRODUCTO FRACCIONADO (kg -> gramos)
+                        unidadEl.textContent = "por kg";
+                        unidadBadge.textContent = "KILO";
+                        
+                        // Mostrar sección de gramos, ocultar sección de unidades
+                        document.getElementById('cantidadFraccionada').style.display = 'block';
+                        document.getElementById('cantidadUnitaria').style.display = 'none';
+                        
+                        // Configurar input para gramos
+                        const inputGramos = document.getElementById('modalProductoCantidadGramos');
+                        inputGramos.min = 50;
+                        inputGramos.max = 5000;
+                        inputGramos.step = 50;
+                        inputGramos.value = 500;
+                        
+                        // Ajustar texto del sufijo
+                        document.getElementById('unidadSuffix').textContent = "g";
+                        
+                        // Mostrar predefinidos para gramos
+                        const presets = document.querySelectorAll('#cantidadFraccionada .preset-cantidad');
+                        presets[0].textContent = "250g";
+                        presets[1].textContent = "500g";
+                        presets[2].textContent = "1kg";
+                        presets[3].textContent = "2kg";
+                    } else {
+                        // PRODUCTO NO FRACCIONADO (unidad, kg entero, etc.)
+                        unidadEl.textContent = "por " + p.unidad_display.toLowerCase();
+                        unidadBadge.textContent = p.unidad_display;
+                        
+                        // Mostrar sección de unidades, ocultar sección de gramos
+                        document.getElementById('cantidadFraccionada').style.display = 'none';
+                        document.getElementById('cantidadUnitaria').style.display = 'block';
+                        
+                        // Configurar input para unidades
+                        const inputUnidades = document.getElementById('modalProductoCantidadUnidades');
+                        inputUnidades.min = 1;
+                        inputUnidades.max = 100;
+                        inputUnidades.step = 1;
+                        inputUnidades.value = 1;
+                        
+                        // Ajustar texto del sufijo según la unidad
+                        const unidadSuffix = document.getElementById('unidadSuffix');
+                        if (p.unidad === "unidad") {
+                            unidadSuffix.textContent = "unidades";
+                        } else if (p.unidad === "kg") {
+                            unidadSuffix.textContent = "kg";
+                        } else {
+                            unidadSuffix.textContent = p.unidad_display.toLowerCase();
+                        }
+                        
+                        // Mostrar predefinidos para unidades
+                        const presets = document.querySelectorAll('#cantidadUnitaria .preset-cantidad');
+                        presets[0].textContent = "1";
+                        presets[1].textContent = "2";
+                        presets[2].textContent = "3";
+                        presets[3].textContent = "5";
+                    }
+                    
+                    // Configurar botón agregar
+                    const btnAgregar = document.getElementById('modalProductoAgregar');
+                    btnAgregar.onclick = agregarProductoDesdeModal;
+                    
                     // Mostrar modal
                     document.getElementById('modalProducto').style.display = "flex";
+                })
+                .catch(error => {
+                    console.error("Error al cargar producto:", error);
+                    mostrarNotificacion("Error al cargar el producto. Intente nuevamente.", "error");
                 });
         }
-
+        
+        function ajustarCantidad(cambio, tipo) {
+            let input, min, max;
+            
+            if (tipo === 'gramos') {
+                input = document.getElementById('modalProductoCantidadGramos');
+                min = 50;
+                max = 5000;
+                // Asegurar que sea múltiplo de 50
+                let valor = parseInt(input.value) + cambio;
+                valor = Math.max(min, Math.min(max, valor));
+                valor = Math.round(valor / 50) * 50;
+                input.value = valor;
+            } else {
+                input = document.getElementById('modalProductoCantidadUnidades');
+                min = 1;
+                max = 100;
+                let valor = parseInt(input.value) + cambio;
+                valor = Math.max(min, Math.min(max, valor));
+                input.value = valor;
+            }
+        }
+        
+        function setCantidad(cantidad, tipo) {
+            if (tipo === 'gramos') {
+                const input = document.getElementById('modalProductoCantidadGramos');
+                input.value = cantidad;
+                
+                // Actualizar estado activo de botones
+                document.querySelectorAll('#cantidadFraccionada .preset-cantidad').forEach(btn => {
+                    btn.classList.remove('active');
+                    // Extraer número del texto del botón
+                    const btnCantidad = parseInt(btn.textContent.replace('g', '').replace('kg', '') * (btn.textContent.includes('kg') ? 1000 : 1));
+                    if (btnCantidad === cantidad) {
+                        btn.classList.add('active');
+                    }
+                });
+            } else {
+                const input = document.getElementById('modalProductoCantidadUnidades');
+                input.value = cantidad;
+                
+                // Actualizar estado activo de botones
+                document.querySelectorAll('#cantidadUnitaria .preset-cantidad').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.textContent) === cantidad) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        function agregarProductoDesdeModal() {
+            if (!productoActual) return;
+            
+            let cantidad, precioFinal;
+            
+            if (esFraccionado) {
+                // Producto fraccionado: cantidad en gramos
+                const inputGramos = document.getElementById('modalProductoCantidadGramos');
+                cantidad = parseFloat(inputGramos.value);
+                
+                if (isNaN(cantidad) || cantidad < 50) {
+                    mostrarNotificacion("La cantidad mínima es 50g.", "error");
+                    return;
+                }
+                
+                // Calcular precio proporcional (gramos a kg)
+                precioFinal = (productoActual.precio_final * cantidad) / 1000;
+            } else {
+                // Producto no fraccionado: cantidad en unidades
+                const inputUnidades = document.getElementById('modalProductoCantidadUnidades');
+                cantidad = parseFloat(inputUnidades.value);
+                
+                if (isNaN(cantidad) || cantidad < 1) {
+                    mostrarNotificacion("La cantidad mínima es 1.", "error");
+                    return;
+                }
+                
+                // Precio por unidad multiplicado por cantidad
+                precioFinal = productoActual.precio_final * cantidad;
+            }
+            
+            agregarAlCarrito(
+                productoActual.id,
+                productoActual.titulo,
+                precioFinal,
+                cantidad,
+                esFraccionado,
+                unidadProducto,
+                true
+            );
+            
+            cerrarProducto();
+        }
+        
         function cerrarProducto() {
+            productoActual = null;
             document.getElementById('modalProducto').style.display = "none";
+        }
+        
+        function mostrarNotificacion(mensaje, tipo = "success") {
+            // Crear elemento de notificación
+            const notificacion = document.createElement('div');
+            notificacion.className = 'notificacion';
+            notificacion.style.animation = 'slideInRight 0.3s ease';
+            notificacion.textContent = mensaje;
+            
+            // Color según tipo
+            if (tipo === "error") {
+                notificacion.style.background = 'linear-gradient(135deg, #e63946 0%, #ff6b6b 100%)';
+            } else if (tipo === "success") {
+                notificacion.style.background = 'linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%)';
+            }
+            
+            // Agregar al body
+            document.body.appendChild(notificacion);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notificacion.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (notificacion.parentNode) {
+                        notificacion.parentNode.removeChild(notificacion);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        /* =========================================================
+           FUNCIONES EXISTENTES
+        ========================================================= */
+        
+        function abrirCarrito() {
+            document.getElementById('modalCarrito').style.display = "flex";
+            actualizarCarritoUI();
+        }
+        
+        function cerrarCarrito() {
+            document.getElementById('modalCarrito').style.display = "none";
+        }
+        
+        function actualizarContador() {
+            const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+            const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            document.getElementById('carritoCount').textContent = totalItems;
+        }
+        
+        function agregarAlCarrito(id, nombre, precio, cantidad, fraccionado, unidad, desdeModal = false) {
+            // Tu función existente para agregar al carrito
+            // Después de agregar, mostrar notificación
+            mostrarNotificacion(`"${nombre}" agregado al carrito`, "success");
+        }
+        
+        function agregarDesdeTarjeta(id, nombre, precio, fraccionado, unidad) {
+            // Tu función existente para agregar desde tarjeta
+        }
+        
+        function agregarDesdeTarjetaDesdeBoton(btn) {
+            // Tu función existente para agregar desde botón en tarjeta
+        }
+        
+        function actualizarCarritoUI() {
+            // Tu función existente para actualizar la UI del carrito
         }
 
     </script>
