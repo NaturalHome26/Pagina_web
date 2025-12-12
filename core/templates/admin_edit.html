@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Producto - Admin</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
 <header class="top-header">
     <div class="logo">NATURAL HOME - Admin</div>
@@ -29,7 +29,6 @@
     <form method="post" enctype="multipart/form-data" class="admin-form" id="productForm">
         {% csrf_token %}
 
-        <!-- ░░ INFORMACIÓN BÁSICA ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
 
@@ -67,13 +66,11 @@
                 </select>
             </div>
 
-            <!-- ░░ NUEVO CAMPO: DESCRIPCIÓN ░░ -->
             <div class="form-group">
                 <label for="id_descripcion"><i class="fas fa-align-left"></i> Descripción</label>
                 <textarea id="id_descripcion" name="descripcion" rows="4">{{ producto.descripcion }}</textarea>
             </div>
 
-            <!-- ░░ NUEVA OPCIÓN: PRODUCTO FRACCIONADO ░░ -->
             <div class="form-group">
                 <label class="checkbox-label large">
                     <input id="id_fraccionado" name="fraccionado" type="checkbox"
@@ -84,7 +81,6 @@
             </div>
         </div>
 
-        <!-- ░░ IMAGEN ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-image"></i> Imagen del Producto</h3>
 
@@ -112,7 +108,6 @@
             </div>
         </div>
 
-        <!-- ░░ DESCUENTOS ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-percentage"></i> Configuración de Descuento</h3>
 
@@ -159,7 +154,6 @@
             </div>
         </div>
 
-        <!-- ░░ ACCIONES ░░ -->
         <div class="form-actions">
             <button type="submit" class="btn-save">
                 <i class="fas fa-save"></i> Guardar Cambios
@@ -175,34 +169,12 @@
         </div>
     </form>
 
-    <!-- Form oculto para eliminar -->
     <form method="post" id="deleteForm" style="display:none;">
         {% csrf_token %}
         <input type="hidden" name="delete" value="1">
     </form>
 </main>
 
-<script>
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = e => document.getElementById('preview').src = e.target.result;
-        reader.readAsDataURL(file);
-    }
-}
-
-function confirmarEliminacion() {
-    if (confirm("¿Seguro que quieres eliminar este producto?")) {
-        document.getElementById('deleteForm').submit();
-    }
-}
-
-function toggleDescuento(checkbox) {
-    document.getElementById('wrap_porcentaje').style.display =
-        checkbox.checked ? "block" : "none";
-}
-</script>
-
+<script src="{% static 'js/admin.js' %}"></script>
 </body>
 </html>

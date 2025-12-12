@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrar Productos - NATURAL HOME</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -21,7 +22,6 @@
         <div class="admin-header">
             <h2><i class="fas fa-boxes"></i> Panel de Productos</h2>
             
-            <!-- Buscador -->
             <form method="get" class="admin-search-form">
                 <div class="search-wrapper">
                     <input type="text" name="q" value="{{ query|default_if_none:'' }}" 
@@ -34,7 +34,6 @@
             </form>
         </div>
         
-        <!-- Información de resultados -->
         <div class="results-info">
             <p>
                 <i class="fas fa-info-circle"></i>
@@ -112,7 +111,6 @@
             </table>
         </div>
         
-        <!-- Paginación -->
         {% if productos.paginator.num_pages > 1 %}
         <div class="pagination">
             <div class="pagination-info">

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NATURAL HOME</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -44,8 +46,6 @@
                      data-unidad="{{ p.unidad }}">
                     <div class="card-carrusel">
                         <div class="card-carrusel-image">
-
-                            <!-- Botón agregar al carrito -->
                             <button class="btn-add-to-cart-icon"
                                     onclick="event.stopPropagation(); agregarDesdeTarjeta({{ p.id }}, '{{ p.titulo|escapejs }}', {{ p.precio_con_descuento }}, {{ p.fraccionado|yesno:'true,false' }}, '{{ p.unidad }}')">
                                 <i class="fas fa-cart-plus"></i>
@@ -59,13 +59,11 @@
 
                         <div class="card-carrusel-content">
                             <h4>{{ p.titulo }}</h4>
-
                             <div class="card-carrusel-pricing">
                                 <div class="pricing-with-discount-carrusel">
                                     <div class="original-price-carrusel">${{ p.precio }}</div>
                                     <div class="current-price-carrusel">${{ p.precio_con_descuento }}</div>
                                 </div>
-
                                 <div class="product-unit-carrusel">
                                     <span class="unit-badge-carrusel">{{ p.get_unidad_display }}</span>
                                 </div>
@@ -80,7 +78,6 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
-
         <div class="carrusel-dots" id="carruselDots"></div>
     </div>
     {% endif %}
@@ -90,10 +87,8 @@
         <form method="get" class="search-form" id="searchForm">
             <div class="search-wrapper">
                 <input type="text" name="q" value="{{ query|default_if_none:'' }}"
-                       id="searchInput" placeholder="Buscar productos..." onkeyup="buscarProductos()">
-
+                       id="searchInput" placeholder="Buscar productos...">
                 <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-
                 {% if query %}
                 <a href="{% url 'home' %}" class="search-clear" title="Limpiar búsqueda">
                     <i class="fas fa-times"></i>
@@ -106,15 +101,12 @@
             <button onclick="filtrar('todas')" class="filter-btn {% if not categoria_actual %}active{% endif %}">
                 Todas
             </button>
-
             <button onclick="filtrar('verduras')" class="filter-btn {% if categoria_actual == 'verduras' %}active{% endif %}">
                 Verduras
             </button>
-
             <button onclick="filtrar('frutas')" class="filter-btn {% if categoria_actual == 'frutas' %}active{% endif %}">
                 Frutas
             </button>
-
             <button onclick="filtrar('otros')" class="filter-btn {% if categoria_actual == 'otros' %}active{% endif %}">
                 Otros
             </button>
@@ -127,7 +119,8 @@
         <a href="{% url 'home' %}" class="clear-search-link">Ver todos los productos</a>
     </div>
     {% endif %}
-        <!-- GRID DE PRODUCTOS -->
+
+    <!-- GRID DE PRODUCTOS -->
     <div class="grid-productos" id="productosContainer">
         {% for p in productos %}
         <div class="card"
@@ -152,7 +145,6 @@
 
             <div class="card-content">
                 <h3>{{ p.titulo }}</h3>
-
                 <div class="card-pricing">
                     {% if p.descuento_activo %}
                     <div class="pricing-with-discount">
@@ -162,19 +154,15 @@
                     {% else %}
                     <div class="normal-price">${{ p.precio }}</div>
                     {% endif %}
-
                     <div class="product-unit">
                         <span class="unit-badge">{{ p.get_unidad_display }}</span>
                     </div>
                 </div>
-
-                <!-- Botón carrito (se mantiene, no interfiere con onclick del modal) -->
                 <button onclick="event.stopPropagation(); agregarDesdeTarjetaDesdeBoton(this)"
                         class="add-to-cart-btn">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
-
         </div>
         
         {% empty %}
@@ -183,7 +171,6 @@
                 <i class="fas fa-box-open"></i>
             </div>
             <p>No hay productos disponibles{% if query %} que coincidan con tu búsqueda{% endif %}.</p>
-
             {% if query %}
             <a href="{% url 'home' %}" class="btn-save">Ver todos los productos</a>
             {% endif %}
@@ -197,7 +184,6 @@
         <div class="pagination-info">
             Página {{ productos.number }} de {{ productos.paginator.num_pages }}
         </div>
-
         <div class="pagination-controls">
             {% if productos.has_previous %}
             <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}" class="pagination-btn">
@@ -243,16 +229,11 @@
                 <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
                 <button class="btn-cerrar" onclick="cerrarCarrito()"><i class="fas fa-times"></i></button>
             </div>
-
-            <div id="listaCarrito" class="lista-carrito">
-                <!-- Items del carrito -->
-            </div>
-
+            <div id="listaCarrito" class="lista-carrito"></div>
             <div class="total-carrito">
                 <span class="total-label">Total:</span>
                 <span id="totalCarrito" class="total-amount">$0</span>
             </div>
-
             <div class="modal-footer">
                 <button class="btn-send"><i class="fas fa-truck"></i> Completar Datos de Envío</button>
                 <button class="btn-cancelar" onclick="cerrarCarrito()">Seguir Comprando</button>
@@ -260,494 +241,91 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE PRODUCTO (VERSIÓN CORREGIDA) -->
+    <!-- MODAL DETALLE PRODUCTO -->
     <div id="modalProducto" class="modal">
         <div class="modal-content" onclick="event.stopPropagation()">
-
-            <!-- Header con gradiente verde -->
             <div class="modal-header">
                 <h2 id="modalProductoTitulo"></h2>
-                <button class="btn-cerrar" onclick="cerrarProducto()"><i class="fas fa-times"></i></button>
+                <button class="btn-cerrar" onclick="cerrarProducto()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <div class="modal-body">
-                <!-- Contenedor de imagen -->
                 <div class="modal-product-image-container">
                     <img id="modalProductoImagen" src="" alt="Producto">
                 </div>
 
-                <!-- Contenedor de descripción -->
                 <div class="modal-product-description-container">
                     <div class="modal-product-description-title">
                         <i class="fas fa-info-circle"></i> Descripción
                     </div>
-                    <p id="modalProductoDescripcion"></p>
+
+                    <!-- CAMBIO CLAVE -->
+                    <div id="modalProductoDescripcion" class="descripcion-texto"></div>
                 </div>
 
-                <!-- Contenedor de información (precio + cantidad) -->
                 <div class="modal-product-info-container">
-                    <!-- Precio -->
+
+                    <!-- PRECIO -->
                     <div class="modal-price-section">
                         <div class="price-label">
                             <i class="fas fa-tag"></i> Precio
                         </div>
-                        <div class="price-value">
+
+                        <div class="price-inline">
                             <span id="modalProductoPrecio"></span>
-                            <div class="price-unit">
-                                <span id="modalProductoUnidad"></span>
-                                <span class="unit-badge-modal" id="modalUnidadBadge"></span>
-                            </div>
+                            <span class="price-separator">/</span>
+                            <span id="modalProductoUnidad"></span>
+                            <span class="unit-badge-modal" id="modalUnidadBadge"></span>
                         </div>
                     </div>
 
-                    <!-- Cantidad - AHORA CON UNA SOLA ESTRUCTURA MÁS FLEXIBLE -->
+                    <!-- CANTIDAD -->
                     <div class="modal-cantidad-section">
                         <div class="cantidad-label">
-                            <i class="fas fa-balance-scale"></i> 
+                            <i class="fas fa-balance-scale"></i>
                             <span id="cantidadLabelText">Cantidad</span>
                         </div>
-                        
-                        <div class="cantidad-controls">
-                            <!-- Grupo de input con sufijo dinámico -->
-                            <div class="cantidad-input-group">
-                                <div class="cantidad-input-wrapper">
-                                    <input id="modalProductoCantidad" type="number" min="1" value="1">
-                                    <span class="cantidad-input-suffix" id="modalUnidadSuffix">unidad</span>
-                                </div>
-                                
-                                <div class="cantidad-buttons">
-                                    <button class="btn-cantidad" onclick="ajustarCantidad(-1)">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <button class="btn-cantidad" onclick="ajustarCantidad(1)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Predefinidos dinámicos -->
-                            <div class="cantidad-presets" id="cantidadPresets">
-                                <!-- Se llenará dinámicamente -->
+
+                        <div class="cantidad-linea">
+                            <input id="modalProductoCantidad"
+                                type="number"
+                                min="1"
+                                value="1">
+                            <span class="cantidad-sufijo" id="modalUnidadSuffix">g</span>
+                            <div class="cantidad-botones">
+                                <button class="btn-cantidad btn-menos" onclick="ajustarCantidad(-1)">−</button>
+                                <button class="btn-cantidad btn-mas" onclick="ajustarCantidad(1)">+</button>
                             </div>
                         </div>
+
+                        <div class="cantidad-presets" id="cantidadPresets"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer del modal -->
             <div class="modal-footer">
                 <button id="modalProductoAgregar" class="btn-send">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
-
         </div>
     </div>
 
-    <script src="{% static 'js/app.js' %}"></script>
-
+    <!-- SCRIPTS -->
+    <script src="{% static 'js/carrito.js' %}"></script>
+    <script src="{% static 'js/producto.js' %}"></script>
+    <script src="{% static 'js/carrusel.js' %}"></script>
+    <script src="{% static 'js/filtros.js' %}"></script>
+    
     <script>
-        /* =========================================================
-           INICIALIZACIÓN GENERAL
-        ========================================================= */
         document.addEventListener('DOMContentLoaded', function() {
-
-            // Botón abrir carrito
-            document.getElementById('btnAbrirCarrito')
-                .addEventListener('click', abrirCarrito);
-
-            // Inicializar carrito desde localStorage
+            document.getElementById('btnAbrirCarrito').addEventListener('click', abrirCarrito);
             actualizarContador();
-
-            // Cerrar modal al hacer clic fuera
-            document.getElementById('modalCarrito')
-                .addEventListener('click', function(e) {
-                    if (e.target === this) cerrarCarrito();
-                });
-
-            // Cerrar modal producto al hacer clic fuera
-            document.getElementById('modalProducto')
-                .addEventListener('click', function(e) {
-                    if (e.target === this) cerrarProducto();
-                });
-
-            setupFilters();
             initCarousel();
+            setupFilters();
         });
-
-        /* =========================================================
-           FILTROS
-        ========================================================= */
-        function setupFilters() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const categoria = urlParams.get('categoria');
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            if (categoria) {
-                const activeBtn = document.querySelector(`.filter-btn[onclick*="${categoria}"]`);
-                if (activeBtn) activeBtn.classList.add('active');
-            } else {
-                const allBtn = document.querySelector('.filter-btn[onclick*="todas"]');
-                if (allBtn) allBtn.classList.add('active');
-            }
-        }
-
-        function filtrar(categoria) {
-            const url = new URL(window.location);
-
-            if (categoria === 'todas') {
-                url.searchParams.delete('categoria');
-            } else {
-                url.searchParams.set('categoria', categoria);
-            }
-
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput.value) {
-                url.searchParams.set('q', searchInput.value);
-            }
-
-            window.location.href = url.toString();
-        }
-
-        /* =========================================================
-           CARRUSEL DE DESCUENTOS
-        ========================================================= */
-
-        let currentSlide = 0;
-        const slidesToShow = 4;
-
-        function initCarousel() {
-            const track = document.getElementById('carruselTrack');
-            if (!track) return;
-
-            const slides = track.children;
-            const total = slides.length;
-
-            const dotsContainer = document.getElementById('carruselDots');
-            if (dotsContainer) {
-                dotsContainer.innerHTML = "";
-                for (let i = 0; i < Math.ceil(total / slidesToShow); i++) {
-                    const dot = document.createElement('div');
-                    dot.classList.add('dot');
-                    if (i === 0) dot.classList.add('active');
-                    dot.addEventListener('click', () => goToSlide(i));
-                    dotsContainer.appendChild(dot);
-                }
-            }
-        }
-
-        function moveCarousel(direction) {
-            const track = document.getElementById('carruselTrack');
-            const slides = track.children;
-
-            const totalGroups = Math.ceil(slides.length / slidesToShow);
-
-            currentSlide += direction;
-
-            if (currentSlide < 0) currentSlide = totalGroups - 1;
-            if (currentSlide >= totalGroups) currentSlide = 0;
-
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-            updateDots();
-        }
-
-        function goToSlide(slideIndex) {
-            currentSlide = slideIndex;
-            const track = document.getElementById('carruselTrack');
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
-            updateDots();
-        }
-
-        function updateDots() {
-            const dots = document.querySelectorAll('#carruselDots .dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-        }
-
-        /* =========================================================
-           MODAL DE PRODUCTO - VERSIÓN CORREGIDA
-        ========================================================= */
-        
-        let productoActual = null;
-        let esFraccionado = false;
-        let unidadProducto = '';
-        
-        function abrirProducto(id) {
-            fetch(`/api/producto/${id}/`)
-                .then(res => res.json())
-                .then(p => {
-                    productoActual = p;
-                    esFraccionado = (p.fraccionado === true && p.unidad === "kg");
-                    unidadProducto = p.unidad;
-                    
-                    // Configurar título
-                    document.getElementById('modalProductoTitulo').textContent = p.titulo;
-                    
-                    // Configurar imagen
-                    const img = document.getElementById('modalProductoImagen');
-                    img.src = p.imagen;
-                    img.alt = p.titulo;
-                    img.onerror = function() {
-                        this.src = '{% static "img/no-image.png" %}';
-                    };
-                    
-                    // Configurar descripción
-                    const descEl = document.getElementById('modalProductoDescripcion');
-                    if (p.descripcion && p.descripcion.trim() !== '') {
-                        descEl.textContent = p.descripcion;
-                    } else {
-                        descEl.textContent = "Sin descripción disponible.";
-                    }
-                    
-                    // Configurar precio
-                    const precioEl = document.getElementById('modalProductoPrecio');
-                    precioEl.textContent = "$" + p.precio_final;
-                    
-                    // Configurar unidad
-                    const unidadEl = document.getElementById('modalProductoUnidad');
-                    const unidadBadge = document.getElementById('modalUnidadBadge');
-                    
-                    if (esFraccionado) {
-                        // PRODUCTO FRACCIONADO (kg -> gramos)
-                        unidadEl.textContent = "por kg";
-                        unidadBadge.textContent = "KILO";
-                        
-                        // Mostrar sección de gramos, ocultar sección de unidades
-                        document.getElementById('cantidadFraccionada').style.display = 'block';
-                        document.getElementById('cantidadUnitaria').style.display = 'none';
-                        
-                        // Configurar input para gramos
-                        const inputGramos = document.getElementById('modalProductoCantidadGramos');
-                        inputGramos.min = 50;
-                        inputGramos.max = 5000;
-                        inputGramos.step = 50;
-                        inputGramos.value = 500;
-                        
-                        // Ajustar texto del sufijo
-                        document.getElementById('unidadSuffix').textContent = "g";
-                        
-                        // Mostrar predefinidos para gramos
-                        const presets = document.querySelectorAll('#cantidadFraccionada .preset-cantidad');
-                        presets[0].textContent = "250g";
-                        presets[1].textContent = "500g";
-                        presets[2].textContent = "1kg";
-                        presets[3].textContent = "2kg";
-                    } else {
-                        // PRODUCTO NO FRACCIONADO (unidad, kg entero, etc.)
-                        unidadEl.textContent = "por " + p.unidad_display.toLowerCase();
-                        unidadBadge.textContent = p.unidad_display;
-                        
-                        // Mostrar sección de unidades, ocultar sección de gramos
-                        document.getElementById('cantidadFraccionada').style.display = 'none';
-                        document.getElementById('cantidadUnitaria').style.display = 'block';
-                        
-                        // Configurar input para unidades
-                        const inputUnidades = document.getElementById('modalProductoCantidadUnidades');
-                        inputUnidades.min = 1;
-                        inputUnidades.max = 100;
-                        inputUnidades.step = 1;
-                        inputUnidades.value = 1;
-                        
-                        // Ajustar texto del sufijo según la unidad
-                        const unidadSuffix = document.getElementById('unidadSuffix');
-                        if (p.unidad === "unidad") {
-                            unidadSuffix.textContent = "unidades";
-                        } else if (p.unidad === "kg") {
-                            unidadSuffix.textContent = "kg";
-                        } else {
-                            unidadSuffix.textContent = p.unidad_display.toLowerCase();
-                        }
-                        
-                        // Mostrar predefinidos para unidades
-                        const presets = document.querySelectorAll('#cantidadUnitaria .preset-cantidad');
-                        presets[0].textContent = "1";
-                        presets[1].textContent = "2";
-                        presets[2].textContent = "3";
-                        presets[3].textContent = "5";
-                    }
-                    
-                    // Configurar botón agregar
-                    const btnAgregar = document.getElementById('modalProductoAgregar');
-                    btnAgregar.onclick = agregarProductoDesdeModal;
-                    
-                    // Mostrar modal
-                    document.getElementById('modalProducto').style.display = "flex";
-                })
-                .catch(error => {
-                    console.error("Error al cargar producto:", error);
-                    mostrarNotificacion("Error al cargar el producto. Intente nuevamente.", "error");
-                });
-        }
-        
-        function ajustarCantidad(cambio, tipo) {
-            let input, min, max;
-            
-            if (tipo === 'gramos') {
-                input = document.getElementById('modalProductoCantidadGramos');
-                min = 50;
-                max = 5000;
-                // Asegurar que sea múltiplo de 50
-                let valor = parseInt(input.value) + cambio;
-                valor = Math.max(min, Math.min(max, valor));
-                valor = Math.round(valor / 50) * 50;
-                input.value = valor;
-            } else {
-                input = document.getElementById('modalProductoCantidadUnidades');
-                min = 1;
-                max = 100;
-                let valor = parseInt(input.value) + cambio;
-                valor = Math.max(min, Math.min(max, valor));
-                input.value = valor;
-            }
-        }
-        
-        function setCantidad(cantidad, tipo) {
-            if (tipo === 'gramos') {
-                const input = document.getElementById('modalProductoCantidadGramos');
-                input.value = cantidad;
-                
-                // Actualizar estado activo de botones
-                document.querySelectorAll('#cantidadFraccionada .preset-cantidad').forEach(btn => {
-                    btn.classList.remove('active');
-                    // Extraer número del texto del botón
-                    const btnCantidad = parseInt(btn.textContent.replace('g', '').replace('kg', '') * (btn.textContent.includes('kg') ? 1000 : 1));
-                    if (btnCantidad === cantidad) {
-                        btn.classList.add('active');
-                    }
-                });
-            } else {
-                const input = document.getElementById('modalProductoCantidadUnidades');
-                input.value = cantidad;
-                
-                // Actualizar estado activo de botones
-                document.querySelectorAll('#cantidadUnitaria .preset-cantidad').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (parseInt(btn.textContent) === cantidad) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-        }
-        
-        function agregarProductoDesdeModal() {
-            if (!productoActual) return;
-            
-            let cantidad, precioFinal;
-            
-            if (esFraccionado) {
-                // Producto fraccionado: cantidad en gramos
-                const inputGramos = document.getElementById('modalProductoCantidadGramos');
-                cantidad = parseFloat(inputGramos.value);
-                
-                if (isNaN(cantidad) || cantidad < 50) {
-                    mostrarNotificacion("La cantidad mínima es 50g.", "error");
-                    return;
-                }
-                
-                // Calcular precio proporcional (gramos a kg)
-                precioFinal = (productoActual.precio_final * cantidad) / 1000;
-            } else {
-                // Producto no fraccionado: cantidad en unidades
-                const inputUnidades = document.getElementById('modalProductoCantidadUnidades');
-                cantidad = parseFloat(inputUnidades.value);
-                
-                if (isNaN(cantidad) || cantidad < 1) {
-                    mostrarNotificacion("La cantidad mínima es 1.", "error");
-                    return;
-                }
-                
-                // Precio por unidad multiplicado por cantidad
-                precioFinal = productoActual.precio_final * cantidad;
-            }
-            
-            agregarAlCarrito(
-                productoActual.id,
-                productoActual.titulo,
-                precioFinal,
-                cantidad,
-                esFraccionado,
-                unidadProducto,
-                true
-            );
-            
-            cerrarProducto();
-        }
-        
-        function cerrarProducto() {
-            productoActual = null;
-            document.getElementById('modalProducto').style.display = "none";
-        }
-        
-        function mostrarNotificacion(mensaje, tipo = "success") {
-            // Crear elemento de notificación
-            const notificacion = document.createElement('div');
-            notificacion.className = 'notificacion';
-            notificacion.style.animation = 'slideInRight 0.3s ease';
-            notificacion.textContent = mensaje;
-            
-            // Color según tipo
-            if (tipo === "error") {
-                notificacion.style.background = 'linear-gradient(135deg, #e63946 0%, #ff6b6b 100%)';
-            } else if (tipo === "success") {
-                notificacion.style.background = 'linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%)';
-            }
-            
-            // Agregar al body
-            document.body.appendChild(notificacion);
-            
-            // Remover después de 3 segundos
-            setTimeout(() => {
-                notificacion.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => {
-                    if (notificacion.parentNode) {
-                        notificacion.parentNode.removeChild(notificacion);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        /* =========================================================
-           FUNCIONES EXISTENTES
-        ========================================================= */
-        
-        function abrirCarrito() {
-            document.getElementById('modalCarrito').style.display = "flex";
-            actualizarCarritoUI();
-        }
-        
-        function cerrarCarrito() {
-            document.getElementById('modalCarrito').style.display = "none";
-        }
-        
-        function actualizarContador() {
-            const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
-            const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            document.getElementById('carritoCount').textContent = totalItems;
-        }
-        
-        function agregarAlCarrito(id, nombre, precio, cantidad, fraccionado, unidad, desdeModal = false) {
-            // Tu función existente para agregar al carrito
-            // Después de agregar, mostrar notificación
-            mostrarNotificacion(`"${nombre}" agregado al carrito`, "success");
-        }
-        
-        function agregarDesdeTarjeta(id, nombre, precio, fraccionado, unidad) {
-            // Tu función existente para agregar desde tarjeta
-        }
-        
-        function agregarDesdeTarjetaDesdeBoton(btn) {
-            // Tu función existente para agregar desde botón en tarjeta
-        }
-        
-        function actualizarCarritoUI() {
-            // Tu función existente para actualizar la UI del carrito
-        }
-
     </script>
 
 </body>

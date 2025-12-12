@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuevo Producto - Admin</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
 <header class="top-header">
     <div class="logo">NATURAL HOME - Admin</div>
@@ -29,7 +29,6 @@
     <form method="post" enctype="multipart/form-data" class="admin-form" id="productForm">
         {% csrf_token %}
 
-        <!-- ░░ INFORMACIÓN BÁSICA ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
 
@@ -67,13 +66,11 @@
                 </select>
             </div>
 
-            <!-- ░░ NUEVO CAMPO DESCRIPCIÓN ░░ -->
             <div class="form-group">
                 <label for="id_descripcion"><i class="fas fa-align-left"></i> Descripción</label>
                 <textarea name="descripcion" class="form-control">{{ producto.descripcion }}</textarea>
             </div>
 
-            <!-- ░░ NUEVA OPCIÓN FRACCIONADO ░░ -->
             <div class="form-group">
                 <label class="checkbox-label large">
                     <input id="id_fraccionado" name="fraccionado" type="checkbox">
@@ -83,7 +80,6 @@
             </div>
         </div>
 
-        <!-- ░░ IMAGEN ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-image"></i> Imagen del Producto</h3>
 
@@ -110,7 +106,6 @@
             </div>
         </div>
 
-        <!-- ░░ DESCUENTOS ░░ -->
         <div class="form-section">
             <h3 class="form-section-title"><i class="fas fa-percentage"></i> Configuración de Descuento</h3>
 
@@ -140,53 +135,17 @@
             </div>
         </div>
 
-        <!-- ░░ ACCIONES ░░ -->
         <div class="form-actions">
             <button type="submit" class="btn-save">
                 <i class="fas fa-plus-circle"></i> Crear Producto
             </button>
-
             <a href="{% url 'admin_products' %}" class="btn-cancel">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </div>
-
     </form>
 </main>
 
-<script>
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = e => document.getElementById('preview').src = e.target.result;
-        reader.readAsDataURL(file);
-    }
-}
-
-function toggleDescuento(checkbox) {
-    document.getElementById('wrap_porcentaje').style.display =
-        checkbox.checked ? "block" : "none";
-
-    calcularDescuento();
-}
-
-function calcularDescuento() {
-    const precio = parseFloat(document.getElementById('id_precio').value) || 0;
-    const porcentaje = parseInt(document.getElementById('id_porcentaje').value) || 0;
-
-    if (porcentaje > 0) {
-        const descuento = precio * (porcentaje / 100);
-        const precioFinal = precio - descuento;
-        document.getElementById('precioFinal').textContent = `$${precioFinal.toFixed(2)}`;
-    } else {
-        document.getElementById('precioFinal').textContent = `$${precio.toFixed(2)}`;
-    }
-}
-
-document.getElementById('id_precio').addEventListener('input', calcularDescuento);
-document.getElementById('id_porcentaje').addEventListener('input', calcularDescuento);
-</script>
-
+<script src="{% static 'js/admin.js' %}"></script>
 </body>
 </html>
