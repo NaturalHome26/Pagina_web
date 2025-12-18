@@ -10,43 +10,53 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.contrib.sessions.backends.db import SessionStore
 
-def home(request):
-    # Búsqueda
-    query = request.GET.get('q', '')
-    categoria = request.GET.get('categoria', '')
-    
-    productos_list = Producto.objects.all()
-    
-    if query:
-        productos_list = productos_list.filter(
-            Q(titulo__icontains=query)
-        )
-    
-    if categoria:
-        productos_list = productos_list.filter(categoria=categoria)
-    
-    # Productos con descuento para el carrusel
-    productos_con_descuento = Producto.objects.filter(descuento_activo=True)[:10]
-    
-    # Paginación (20 por página) - Nota: el usuario quiere 10 en el futuro
-    paginator = Paginator(productos_list, 20)
-    page = request.GET.get('page')
-    
-    try:
-        productos = paginator.page(page)
-    except PageNotAnInteger:
-        productos = paginator.page(1)
-    except EmptyPage:
-        productos = paginator.page(paginator.num_pages)
-    
-    return render(request, "home.html", {
-        "productos": productos,
-        "query": query,
-        "categoria_actual": categoria,
-        "productos_descuento": productos_con_descuento
-    })
+# Credenciales fijas para el admin (puedes cambiarlas)
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin123"
 
+def login_required_admin(view_func):
+    """Decorador personalizado para verificar si el usuario está logueado como admin"""
+    def wrapper(request, *args, **kwargs):
+        if request.session.get('admin_logged_in'):
+            return view_func(request, *args, **kwargs)
+        return redirect('admin_login')
+    return wrapper
+
+def admin_login(request):
+    """Vista para login del admin"""
+    if request.session.get('admin_logged_in'):
+        return redirect('admin_products')
+    
+    error = None
+    
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            # Credenciales correctas
+            request.session['admin_logged_in'] = True
+            request.session['admin_username'] = username
+            # Guardar la sesión
+            request.session.save()
+            return redirect('admin_products')
+        else:
+            error = "Usuario o contraseña incorrectos"
+    
+    return render(request, "admin_login.html", {"error": error})
+
+def admin_logout(request):
+    """Vista para logout del admin"""
+    if 'admin_logged_in' in request.session:
+        del request.session['admin_logged_in']
+    if 'admin_username' in request.session:
+        del request.session['admin_username']
+    request.session.save()
+    return redirect('admin_login')
+
+@login_required_admin
 def admin_products(request):
     # Búsqueda en admin
     query = request.GET.get('q', '')
@@ -69,13 +79,134 @@ def admin_products(request):
     except EmptyPage:
         productos = paginator.page(paginator.num_pages)
     
+    # Obtener el nombre de usuario de la sesión
+    username = request.session.get('admin_username', 'Admin')
+    
     return render(request, "admin_products.html", {
         "productos": productos,
-        "query": query
+        "query": query,
+        "username": username
     })
 
+@login_required_admin
+def admin_new(request):
+    # Obtener el nombre de usuario de la sesión
+    username = request.session.get('admin_username', 'Admin')
+    
+    if request.method == "POST":
+        titulo = request.POST.get("titulo", "").strip()
+        precio = request.POST.get("precio", "").strip()
+        unidad = request.POST.get("unidad", "").strip()
+        categoria = request.POST.get("categoria", "").strip()
+        descripcion = request.POST.get("descripcion", "").strip()
+
+        if not titulo or not precio or not unidad or not categoria:
+            return render(request, "admin_new.html", {
+                "producto": None,
+                "error": "Todos los campos marcados con * son obligatorios",
+                "username": username
+            })
+
+        if "imagen" not in request.FILES:
+            return render(request, "admin_new.html", {
+                "producto": None,
+                "error": "Debe subir una imagen principal para el producto",
+                "username": username
+            })
+
+        # FRACCIONADO
+        fraccionado = "fraccionado" in request.POST
+
+        # DESCUENTO
+        descuento_activo = "descuento_activo" in request.POST
+        if descuento_activo:
+            porcentaje_raw = request.POST.get("porcentaje_descuento", "").strip()
+            porcentaje = int(porcentaje_raw) if porcentaje_raw.isdigit() else 0
+        else:
+            porcentaje = 0
+
+        try:
+            # Crear producto con imagen principal
+            producto = Producto(
+                titulo=titulo,
+                precio=precio,
+                unidad=unidad,
+                categoria=categoria,
+                descripcion=descripcion,
+                fraccionado=fraccionado,
+                descuento_activo=descuento_activo,
+                porcentaje_descuento=porcentaje,
+                imagen=request.FILES["imagen"]
+            )
+            
+            # Guardar primero para tener un ID
+            producto.save()
+            
+            # Procesar imágenes adicionales si existen
+            imagenes_adicionales = []
+            if 'additional_images_data' in request.POST and request.POST['additional_images_data']:
+                try:
+                    additional_images = json.loads(request.POST['additional_images_data'])
+                    for img_data in additional_images:
+                        if 'base64' in img_data:
+                            # CORRECCIÓN: Manejar diferentes formatos de base64
+                            base64_data = img_data['base64']
+                            
+                            # Verificar si tiene el formato completo o solo los datos
+                            if ';base64,' in base64_data:
+                                # Formato completo: data:image/png;base64,iVBORw0...
+                                format_part, imgstr = base64_data.split(';base64,')
+                                ext = format_part.split('/')[-1] if '/' in format_part else 'png'
+                            else:
+                                # Solo datos base64 sin formato
+                                imgstr = base64_data
+                                # Intentar obtener extensión del tipo
+                                ext = img_data.get('type', 'png').split('/')[-1] if '/' in img_data.get('type', '') else 'png'
+                            
+                            # Generar nombre único
+                            from datetime import datetime
+                            filename = f"additional_{producto.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(imagenes_adicionales)}.{ext}"
+                            
+                            # Guardar archivo
+                            try:
+                                data = ContentFile(base64.b64decode(imgstr))
+                                file_path = default_storage.save(f'productos/adicionales/{filename}', data)
+                                
+                                # Agregar a la lista
+                                imagenes_adicionales.append({
+                                    'url': file_path,
+                                    'filename': filename
+                                })
+                            except Exception as decode_error:
+                                print(f"Error decodificando base64: {decode_error}")
+                                continue
+                except Exception as e:
+                    print(f"Error procesando imágenes adicionales: {e}")
+            
+            # Guardar imágenes adicionales
+            producto.set_imagenes_adicionales(imagenes_adicionales)
+            producto.save()
+            
+            return redirect("admin_products")
+        except Exception as e:
+            return render(request, "admin_new.html", {
+                "producto": None,
+                "error": f"Error: {str(e)}",
+                "username": username
+            })
+
+    # GET request - mostrar formulario vacío
+    return render(request, "admin_new.html", {
+        "producto": None,
+        "username": username
+    })
+
+@login_required_admin
 def admin_edit(request, id):
     producto = get_object_or_404(Producto, id=id)
+    
+    # Obtener el nombre de usuario de la sesión
+    username = request.session.get('admin_username', 'Admin')
     
     if request.method == "POST":
         # ELIMINAR
@@ -157,106 +288,47 @@ def admin_edit(request, id):
         producto.save()
         return redirect("admin_products")
     
-    return render(request, "admin_edit.html", {"producto": producto})
+    # GET request - mostrar formulario con datos del producto
+    return render(request, "admin_edit.html", {
+        "producto": producto,
+        "username": username
+    })
 
-def admin_new(request):
-    if request.method == "POST":
-        titulo = request.POST.get("titulo", "").strip()
-        precio = request.POST.get("precio", "").strip()
-        unidad = request.POST.get("unidad", "").strip()
-        categoria = request.POST.get("categoria", "").strip()
-        descripcion = request.POST.get("descripcion", "").strip()
-
-        if not titulo or not precio or not unidad or not categoria:
-            return render(request, "admin_new.html", {
-                "error": "Todos los campos marcados con * son obligatorios"
-            })
-
-        if "imagen" not in request.FILES:
-            return render(request, "admin_new.html", {
-                "error": "Debe subir una imagen principal para el producto"
-            })
-
-        # FRACCIONADO
-        fraccionado = "fraccionado" in request.POST
-
-        # DESCUENTO
-        descuento_activo = "descuento_activo" in request.POST
-        if descuento_activo:
-            porcentaje_raw = request.POST.get("porcentaje_descuento", "").strip()
-            porcentaje = int(porcentaje_raw) if porcentaje_raw.isdigit() else 0
-        else:
-            porcentaje = 0
-
-        try:
-            # Crear producto con imagen principal
-            producto = Producto(
-                titulo=titulo,
-                precio=precio,
-                unidad=unidad,
-                categoria=categoria,
-                descripcion=descripcion,
-                fraccionado=fraccionado,
-                descuento_activo=descuento_activo,
-                porcentaje_descuento=porcentaje,
-                imagen=request.FILES["imagen"]
-            )
-            
-            # Guardar primero para tener un ID
-            producto.save()
-            
-            # Procesar imágenes adicionales si existen
-            imagenes_adicionales = []
-            if 'additional_images_data' in request.POST and request.POST['additional_images_data']:
-                try:
-                    additional_images = json.loads(request.POST['additional_images_data'])
-                    for img_data in additional_images:
-                        if 'base64' in img_data:
-                            # CORRECCIÓN: Manejar diferentes formatos de base64
-                            base64_data = img_data['base64']
-                            
-                            # Verificar si tiene el formato completo o solo los datos
-                            if ';base64,' in base64_data:
-                                # Formato completo: data:image/png;base64,iVBORw0...
-                                format_part, imgstr = base64_data.split(';base64,')
-                                ext = format_part.split('/')[-1] if '/' in format_part else 'png'
-                            else:
-                                # Solo datos base64 sin formato
-                                imgstr = base64_data
-                                # Intentar obtener extensión del tipo
-                                ext = img_data.get('type', 'png').split('/')[-1] if '/' in img_data.get('type', '') else 'png'
-                            
-                            # Generar nombre único
-                            from datetime import datetime
-                            filename = f"additional_{producto.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(imagenes_adicionales)}.{ext}"
-                            
-                            # Guardar archivo
-                            try:
-                                data = ContentFile(base64.b64decode(imgstr))
-                                file_path = default_storage.save(f'productos/adicionales/{filename}', data)
-                                
-                                # Agregar a la lista
-                                imagenes_adicionales.append({
-                                    'url': file_path,
-                                    'filename': filename
-                                })
-                            except Exception as decode_error:
-                                print(f"Error decodificando base64: {decode_error}")
-                                continue
-                except Exception as e:
-                    print(f"Error procesando imágenes adicionales: {e}")
-            
-            # Guardar imágenes adicionales
-            producto.set_imagenes_adicionales(imagenes_adicionales)
-            producto.save()
-            
-            return redirect("admin_products")
-        except Exception as e:
-            return render(request, "admin_new.html", {
-                "error": f"Error: {str(e)}"
-            })
-
-    return render(request, "admin_new.html", {"producto": None})
+def home(request):
+    # Búsqueda
+    query = request.GET.get('q', '')
+    categoria = request.GET.get('categoria', '')
+    
+    productos_list = Producto.objects.all()
+    
+    if query:
+        productos_list = productos_list.filter(
+            Q(titulo__icontains=query)
+        )
+    
+    if categoria:
+        productos_list = productos_list.filter(categoria=categoria)
+    
+    # Productos con descuento para el carrusel
+    productos_con_descuento = Producto.objects.filter(descuento_activo=True)[:10]
+    
+    # Paginación (20 por página) - Nota: el usuario quiere 10 en el futuro
+    paginator = Paginator(productos_list, 20)
+    page = request.GET.get('page')
+    
+    try:
+        productos = paginator.page(page)
+    except PageNotAnInteger:
+        productos = paginator.page(1)
+    except EmptyPage:
+        productos = paginator.page(paginator.num_pages)
+    
+    return render(request, "home.html", {
+        "productos": productos,
+        "query": query,
+        "categoria_actual": categoria,
+        "productos_descuento": productos_con_descuento
+    })
 
 def api_producto(request, id):
     try:
@@ -319,6 +391,7 @@ def api_producto(request, id):
 
 # Nueva función para eliminar producto desde la lista
 @require_POST
+@login_required_admin
 def admin_delete(request, id):
     producto = get_object_or_404(Producto, id=id)
     

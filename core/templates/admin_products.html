@@ -7,15 +7,30 @@
     <title>Administrar Productos - NATURAL HOME</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_header.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
-<body>
-    <header class="top-header">
-        <div class="logo">NATURAL HOME - Admin</div>
-        <div class="header-actions">
-            <a href="{% url 'home' %}" class="btn-volver"><i class="fas fa-store"></i> Ver Tienda</a>
-            <a href="{% url 'admin_new' %}" class="btn-save"><i class="fas fa-plus"></i> Nuevo Producto</a>
+<body class="admin-page">
+    <!-- HEADER FIXED DE ADMINISTRADOR -->
+    <header class="admin-main-header">
+        <div class="admin-main-header-left">
+            <div class="logo">NATURAL HOME ADMIN</div>
+            <div class="admin-user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ username }}</span>
+            </div>
+        </div>
+        <div class="admin-main-header-right">
+            <a href="{% url 'home' %}" class="btn-header">
+                <i class="fas fa-home"></i> Ver Tienda
+            </a>
+            <a href="{% url 'admin_new' %}" class="btn-header btn-new">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+            <a href="{% url 'admin_logout' %}" class="btn-header btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
         </div>
     </header>
     

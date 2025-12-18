@@ -129,3 +129,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Configuración de sesiones
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Base de datos
+SESSION_COOKIE_AGE = 3600  # 1 hora en segundos
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # Cambiar a True en producción con HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'

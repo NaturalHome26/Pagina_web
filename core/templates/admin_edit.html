@@ -4,766 +4,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Producto - Admin</title>
+    <title>Editar Producto - NATURAL HOME</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_header.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Estilos para la funcionalidad de múltiples imágenes */
-        .image-upload-section {
-            margin-bottom: 25px;
-        }
-        
-        .image-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .image-preview-item {
-            position: relative;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            height: 120px;
-            background: #f8f9fa;
-            transition: all 0.3s;
-        }
-        
-        .image-preview-item:hover {
-            border-color: #1f8e3c;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            padding: 10px;
-        }
-        
-        .image-preview-item.primary {
-            border-color: #1f8e3c;
-            border-width: 3px;
-        }
-        
-        .image-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: #1f8e3c;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .remove-image-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #e63946;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-        
-        .remove-image-btn:hover {
-            background: #c1121f;
-            transform: scale(1.1);
-        }
-        
-        .image-order-controls {
-            position: absolute;
-            bottom: 8px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .order-btn {
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 10px;
-            transition: all 0.3s;
-        }
-        
-        .order-btn:hover {
-            background: rgba(0,0,0,0.9);
-            transform: scale(1.1);
-        }
-        
-        .file-input-wrapper {
-            margin-top: 15px;
-        }
-        
-        .file-input-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .file-input-label:hover {
-            background: linear-gradient(135deg, #187530 0%, #0f9c40 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(31, 142, 60, 0.3);
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .image-count {
-            margin-top: 10px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .upload-hint {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        
-        .existing-images-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .existing-images-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .existing-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-        }
-        
-        .existing-image-item {
-            position: relative;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            height: 100px;
-        }
-        
-        .existing-image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .existing-image-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: #4361ee;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-        }
-    </style>
 </head>
-<body>
-<header class="top-header">
-    <div class="logo">NATURAL HOME - Admin</div>
-    <a href="{% url 'admin_products' %}" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver</a>
-</header>
-
-<main class="admin-container">
-    <div class="admin-header">
-        <h2><i class="fas fa-edit"></i> Editar Producto</h2>
-    </div>
-
-    {% if error %}
-    <div class="alert-error">
-        <i class="fas fa-exclamation-circle"></i> {{ error }}
-    </div>
-    {% endif %}
-
-    <form method="post" enctype="multipart/form-data" class="admin-form" id="productForm">
-        {% csrf_token %}
-
-        <div class="form-section">
-            <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información Básica</h3>
-
-            <div class="form-group">
-                <label for="id_titulo"><i class="fas fa-heading"></i> Título *</label>
-                <input id="id_titulo" name="titulo" type="text"
-                       value="{{ producto.titulo|default_if_none:'' }}" required>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id_precio"><i class="fas fa-tag"></i> Precio ($) *</label>
-                    <input id="id_precio" name="precio" type="number" step="0.01" min="0"
-                           value="{{ producto.precio|default_if_none:'' }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_unidad"><i class="fas fa-weight"></i> Unidad de medida *</label>
-                    <select id="id_unidad" name="unidad" required>
-                        <option value="">Seleccione unidad</option>
-                        <option value="kg" {% if producto.unidad == "kg" %}selected{% endif %}>Kilogramo (kg)</option>
-                        <option value="unidad" {% if producto.unidad == "unidad" %}selected{% endif %}>Unidad</option>
-                        <option value="paquete" {% if producto.unidad == "paquete" %}selected{% endif %}>Paquete</option>
-                        <option value="litro" {% if producto.unidad == "litro" %}selected{% endif %}>Litro</option>
-                        <option value="docena" {% if producto.unidad == "docena" %}selected{% endif %}>Docena</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="id_categoria"><i class="fas fa-tags"></i> Categoría *</label>
-                <select id="id_categoria" name="categoria" required>
-                    <option value="">Seleccione categoría</option>
-                    <option value="frutas" {% if producto.categoria == "frutas" %}selected{% endif %}>Frutas</option>
-                    <option value="verduras" {% if producto.categoria == "verduras" %}selected{% endif %}>Verduras</option>
-                    <option value="canastas" {% if producto.categoria == "canastas" %}selected{% endif %}>Canastas</option>
-                    <option value="combos" {% if producto.categoria == "combos" %}selected{% endif %}>Combos</option>
-                    <option value="otros" {% if producto.categoria == "otros" %}selected{% endif %}>Otros</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="id_descripcion"><i class="fas fa-align-left"></i> Descripción</label>
-                <textarea id="id_descripcion" name="descripcion" rows="4" placeholder="Ingresa una descripción detallada del producto...">{{ producto.descripcion|default_if_none:'' }}</textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="checkbox-label large">
-                    <input id="id_fraccionado" name="fraccionado" type="checkbox"
-                           {% if producto.fraccionado %}checked{% endif %}>
-                    <span class="checkbox-text">Permitir ventas por fracciones (½ kg, ¼ kg, etc.)</span>
-                </label>
-                <p class="form-help">Solo habilitar si el producto se vende por kilo.</p>
+<body class="admin-page">
+    <!-- HEADER FIXED DE ADMINISTRADOR -->
+    <header class="admin-main-header">
+        <div class="admin-main-header-left">
+            <div class="logo">NATURAL HOME ADMIN</div>
+            <div class="admin-user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ username }}</span>
             </div>
         </div>
-
-        <div class="form-section">
-            <h3 class="form-section-title"><i class="fas fa-image"></i> Imágenes del Producto</h3>
-
-            <!-- Imágenes existentes -->
-            <div class="existing-images-section">
-                <div class="existing-images-title">
-                    <i class="fas fa-images"></i> Imágenes actuales
-                </div>
-                
-                <!-- Imagen principal existente -->
-                <div class="form-group">
-                    <label>Imagen principal actual</label>
-                    {% if producto.imagen %}
-                    <div class="existing-images-grid">
-                        <div class="existing-image-item">
-                            <img src="{{ producto.imagen.url }}" alt="Imagen principal">
-                            <span class="existing-image-badge">Principal</span>
-                            <input type="hidden" name="keep_main_image" value="1">
-                        </div>
-                    </div>
-                    <p class="form-help">Para cambiar la imagen principal, selecciona una nueva abajo.</p>
-                    {% else %}
-                    <p class="form-help text-warning">No hay imagen principal actual.</p>
-                    {% endif %}
-                </div>
-                
-                <!-- Imágenes adicionales existentes -->
-                {% with producto.get_imagenes_adicionales as imagenes_adicionales %}
-                {% if imagenes_adicionales %}
-                <div class="form-group">
-                    <label>Imágenes adicionales actuales ({{ imagenes_adicionales|length }})</label>
-                    <div class="existing-images-grid">
-                        {% for img in imagenes_adicionales %}
-                        <div class="existing-image-item" data-image-index="{{ forloop.counter0 }}">
-                            <img src="{% if img.url_completa %}{{ img.url_completa }}{% else %}{{ img.url }}{% endif %}" 
-                                 alt="Imagen adicional {{ forloop.counter }}">
-                            <span class="existing-image-badge">Adicional</span>
-                            <button type="button" class="remove-image-btn" onclick="removeExistingImage(this, {{ forloop.counter0 }})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <input type="hidden" name="keep_additional_image_{{ forloop.counter0 }}" value="1" id="keep_additional_{{ forloop.counter0 }}">
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                {% endwith %}
-            </div>
-
-            <!-- Campo principal para imagen (opcional en edición) -->
-            <div class="form-group">
-                <label for="id_imagen">Nueva imagen principal (opcional)</label>
-                <div class="file-upload">
-                    <input id="id_imagen" name="imagen" type="file" accept="image/*">
-                    <div class="file-upload-label">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span>Click para seleccionar nueva imagen principal</span>
-                    </div>
-                </div>
-                <p class="form-help">Deja en blanco para mantener la imagen principal actual.</p>
-            </div>
-
-            <!-- Nuevas imágenes adicionales -->
-            <div class="form-group">
-                <label>Agregar más imágenes (opcional)</label>
-                <div class="file-input-wrapper">
-                    <label class="file-input-label">
-                        <i class="fas fa-plus"></i>
-                        Agregar más imágenes
-                        <input type="file" id="additionalImages" class="file-input" 
-                               accept="image/*" multiple>
-                    </label>
-                </div>
-                <p class="form-help">Puedes agregar hasta 5 imágenes adicionales para mostrar diferentes ángulos del producto.</p>
-                <div class="image-count" id="imageCount">Total de nuevas imágenes: 0</div>
-                <p class="upload-hint">Formatos aceptados: JPG, PNG, WebP. Tamaño máximo por imagen: 2MB.</p>
-            </div>
-
-            <!-- Vista previa de nuevas imágenes -->
-            <div class="image-preview-grid" id="imagePreviewGrid">
-                <!-- Las nuevas imágenes se mostrarán aquí -->
-            </div>
-
-            <!-- Campo oculto para datos de imágenes adicionales -->
-            <input type="hidden" name="additional_images_data" id="additionalImagesData" value="">
-        </div>
-
-        <div class="form-section">
-            <h3 class="form-section-title"><i class="fas fa-percentage"></i> Configuración de Descuento</h3>
-
-            <div class="form-group">
-                <label class="checkbox-label large">
-                    <input id="id_descuento_activo" name="descuento_activo" type="checkbox"
-                           {% if producto.descuento_activo %}checked{% endif %}
-                           onchange="toggleDescuento(this)">
-                    <span class="checkbox-text">Activar descuento para este producto</span>
-                </label>
-            </div>
-
-            <div id="wrap_porcentaje" class="form-group descuento-fields" 
-                 style="display: {% if producto.descuento_activo %}block{% else %}none{% endif %};">
-                <label for="id_porcentaje">Porcentaje de descuento</label>
-
-                <div class="descuento-input-group">
-                    <input id="id_porcentaje" name="porcentaje_descuento" type="number"
-                           min="0" max="100" value="{{ producto.porcentaje_descuento|default_if_none:'0' }}">
-                    <span class="input-suffix">%</span>
-                </div>
-
-                <div class="precio-calculo">
-                    <div class="precio-info">
-                        <span class="precio-label">Precio con descuento:</span>
-                        <span class="precio-valor descuento" id="precioFinal">
-                            ${{ producto.precio_con_descuento|default_if_none:producto.precio }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn-save">
-                <i class="fas fa-save"></i> Guardar Cambios
-            </button>
-            <a href="{% url 'admin_products' %}" class="btn-cancel">
-                <i class="fas fa-times"></i> Cancelar
+        <div class="admin-main-header-right">
+            <a href="{% url 'home' %}" class="btn-header">
+                <i class="fas fa-home"></i> Ver Tienda
             </a>
-            <button type="button" class="btn-delete" onclick="confirmarEliminacion()">
-                <i class="fas fa-trash"></i> Eliminar Producto
-            </button>
+            <a href="{% url 'admin_products' %}" class="btn-header">
+                <i class="fas fa-boxes"></i> Productos
+            </a>
+            <a href="{% url 'admin_logout' %}" class="btn-header btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
         </div>
-    </form>
+    </header>
 
-    <form method="post" id="deleteForm" style="display:none;">
-        {% csrf_token %}
-        <input type="hidden" name="delete" value="1">
-    </form>
-</main>
+    <main class="admin-container">
+        <div class="admin-header">
+            <h2><i class="fas fa-edit"></i> Editar Producto</h2>
+            <a href="{% url 'admin_products' %}" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a Productos</a>
+        </div>
 
-<script src="{% static 'js/admin.js' %}"></script>
-<script>
-    // Variables globales para el nuevo sistema
-    let allImages = [];
-    let imageCounter = 0;
-    
-    // Función para eliminar imágenes existentes
-    function removeExistingImage(button, index) {
-        if (confirm('¿Eliminar esta imagen adicional?')) {
-            const imageItem = button.closest('.existing-image-item');
-            const hiddenInput = document.getElementById(`keep_additional_${index}`);
+        <form method="POST" enctype="multipart/form-data" class="admin-form">
+            {% csrf_token %}
             
-            if (imageItem) {
-                // Ocultar la imagen
-                imageItem.style.opacity = '0.5';
-                imageItem.style.border = '2px dashed #e63946';
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-info-circle"></i> Información Básica
+                </div>
                 
-                // Marcar para eliminación
-                if (hiddenInput) {
-                    hiddenInput.value = '0';
-                }
+                <div class="form-group">
+                    <label for="titulo"><i class="fas fa-heading"></i> Título *</label>
+                    <input type="text" id="titulo" name="titulo" required 
+                           value="{{ producto.titulo }}">
+                </div>
                 
-                // Cambiar el botón
-                button.innerHTML = '<i class="fas fa-undo"></i>';
-                button.onclick = function() {
-                    restoreExistingImage(this, index);
-                };
-                button.title = 'Restaurar imagen';
-            }
-        }
-    }
-    
-    function restoreExistingImage(button, index) {
-        const imageItem = button.closest('.existing-image-item');
-        const hiddenInput = document.getElementById(`keep_additional_${index}`);
-        
-        if (imageItem) {
-            // Restaurar la imagen
-            imageItem.style.opacity = '1';
-            imageItem.style.border = '1px solid #ddd';
-            
-            // Marcar para mantener
-            if (hiddenInput) {
-                hiddenInput.value = '1';
-            }
-            
-            // Cambiar el botón
-            button.innerHTML = '<i class="fas fa-trash"></i>';
-            button.onclick = function() {
-                removeExistingImage(this, index);
-            };
-            button.title = 'Eliminar imagen';
-        }
-    }
-    
-    // Inicializar cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', function() {
-        // Configurar eventos para imágenes
-        const mainImageInput = document.getElementById('id_imagen');
-        const additionalImagesInput = document.getElementById('additionalImages');
-        const productForm = document.getElementById('productForm');
-        
-        // Evento para imagen principal
-        if (mainImageInput) {
-            mainImageInput.addEventListener('change', function(event) {
-                handleImageUpload(event, 'main');
-            });
-        }
-        
-        // Evento para imágenes adicionales
-        if (additionalImagesInput) {
-            additionalImagesInput.addEventListener('change', function(event) {
-                handleAdditionalImages(event);
-            });
-        }
-        
-        // Evento para submit del formulario
-        if (productForm) {
-            productForm.addEventListener('submit', function(e) {
-                // Crear un campo oculto con todas las imágenes adicionales en base64
-                const additionalImages = allImages.filter(img => img.type === 'additional');
-                if (additionalImages.length > 0) {
-                    const additionalImagesData = additionalImages.map(img => {
-                        // Obtener solo la parte de datos base64 (sin el prefijo data:)
-                        let base64Data = img.base64;
-                        if (base64Data.includes(',')) {
-                            base64Data = base64Data.split(',')[1];
-                        }
-                        
-                        return { 
-                            base64: base64Data,
-                            name: img.file.name,
-                            type: img.file.type
-                        };
-                    });
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio"><i class="fas fa-tag"></i> Precio ($) *</label>
+                        <input type="number" id="precio" name="precio" step="0.01" min="0" required 
+                               value="{{ producto.precio }}">
+                    </div>
                     
-                    document.getElementById('additionalImagesData').value = JSON.stringify(additionalImagesData);
-                }
+                    <div class="form-group">
+                        <label for="unidad"><i class="fas fa-balance-scale"></i> Unidad de medida *</label>
+                        <select id="unidad" name="unidad" required>
+                            <option value="kg" {% if producto.unidad == "kg" %}selected{% endif %}>Kilogramo (kg)</option>
+                            <option value="unidad" {% if producto.unidad == "unidad" %}selected{% endif %}>Unidad</option>
+                            <option value="paquete" {% if producto.unidad == "paquete" %}selected{% endif %}>Paquete</option>
+                            <option value="litro" {% if producto.unidad == "litro" %}selected{% endif %}>Litro</option>
+                            <option value="docena" {% if producto.unidad == "docena" %}selected{% endif %}>Docena</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria"><i class="fas fa-tags"></i> Categoría *</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="frutas" {% if producto.categoria == "frutas" %}selected{% endif %}>Frutas</option>
+                            <option value="verduras" {% if producto.categoria == "verduras" %}selected{% endif %}>Verduras</option>
+                            <option value="canastas" {% if producto.categoria == "canastas" %}selected{% endif %}>Canastas</option>
+                            <option value="combos" {% if producto.categoria == "combos" %}selected{% endif %}>Combos</option>
+                            <option value="otros" {% if producto.categoria == "otros" %}selected{% endif %}>Otros</option>
+                        </select>
+                    </div>
+                </div>
                 
-                return true;
-            });
-        }
-        
-        // Calcular descuento inicial
-        calcularDescuento();
-    });
-    
-    // Función para manejar la imagen principal
-    function handleImageUpload(event, type) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        // Validar tamaño (2MB máximo)
-        if (file.size > 2 * 1024 * 1024) {
-            alert(`❌ La imagen "${file.name}" es demasiado grande. Máximo 2MB.`);
-            event.target.value = '';
-            return;
-        }
-        
-        // Verificar si ya existe una imagen principal en las nuevas
-        const existingMainIndex = allImages.findIndex(img => img.type === 'main');
-        if (existingMainIndex !== -1) {
-            allImages.splice(existingMainIndex, 1);
-        }
-        
-        processImageFile(file, type);
-    }
-    
-    // Función para manejar imágenes adicionales
-    function handleAdditionalImages(event) {
-        const files = event.target.files;
-        const additionalImagesCount = allImages.filter(img => img.type === 'additional').length;
-        
-        // Verificar límite máximo
-        if (additionalImagesCount + files.length > 5) {
-            alert('❌ Máximo 5 imágenes adicionales permitidas.');
-            event.target.value = '';
-            return;
-        }
-        
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
+                <div class="form-group">
+                    <label for="descripcion"><i class="fas fa-align-left"></i> Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="4">{{ producto.descripcion|default_if_none:'' }}</textarea>
+                </div>
+            </div>
             
-            // Validar tamaño (2MB máximo)
-            if (file.size > 2 * 1024 * 1024) {
-                alert(`❌ La imagen "${file.name}" es demasiado grande. Máximo 2MB.`);
-                continue;
-            }
-            
-            processImageFile(file, 'additional');
-        }
-        
-        event.target.value = ''; // Limpiar input para permitir seleccionar las mismas imágenes otra vez
-    }
-    
-    // Función para procesar un archivo de imagen
-    function processImageFile(file, type) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const imageId = `img_${imageCounter++}`;
-            const imageObj = {
-                id: imageId,
-                type: type,
-                file: file,
-                preview: e.target.result,
-                base64: e.target.result
-            };
-            
-            allImages.push(imageObj);
-            updateImagePreview();
-            updateImageCount();
-        };
-        
-        reader.readAsDataURL(file);
-    }
-    
-    // Función para actualizar la vista previa
-    function updateImagePreview() {
-        const previewGrid = document.getElementById('imagePreviewGrid');
-        if (!previewGrid) return;
-        
-        previewGrid.innerHTML = '';
-        
-        allImages.forEach((img, index) => {
-            const previewItem = document.createElement('div');
-            previewItem.className = `image-preview-item ${img.type === 'main' ? 'primary' : ''}`;
-            previewItem.dataset.id = img.id;
-            
-            const imgElement = document.createElement('img');
-            imgElement.src = img.preview;
-            imgElement.alt = `Imagen ${index + 1}`;
-            imgElement.style.maxWidth = '100%';
-            imgElement.style.maxHeight = '100%';
-            
-            const badge = document.createElement('div');
-            badge.className = 'image-badge';
-            badge.textContent = img.type === 'main' ? 'Nueva Principal' : 'Nueva Adicional';
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-image-btn';
-            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-            removeBtn.onclick = (e) => {
-                e.stopPropagation();
-                removeImage(img.id);
-            };
-            
-            previewItem.appendChild(imgElement);
-            previewItem.appendChild(badge);
-            previewItem.appendChild(removeBtn);
-            
-            // Controles de orden solo para imágenes adicionales
-            if (img.type === 'additional' && allImages.filter(i => i.type === 'additional').length > 1) {
-                const orderControls = document.createElement('div');
-                orderControls.className = 'image-order-controls';
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-images"></i> Imágenes del Producto
+                </div>
                 
-                const additionalImages = allImages.filter(i => i.type === 'additional');
-                const currentIndex = additionalImages.findIndex(i => i.id === img.id);
-                
-                if (currentIndex > 0) {
-                    const moveUpBtn = document.createElement('button');
-                    moveUpBtn.className = 'order-btn';
-                    moveUpBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-                    moveUpBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        moveImage(img.id, -1);
-                    };
-                    orderControls.appendChild(moveUpBtn);
-                }
-                
-                if (currentIndex < additionalImages.length - 1) {
-                    const moveDownBtn = document.createElement('button');
-                    moveDownBtn.className = 'order-btn';
-                    moveDownBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
-                    moveDownBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        moveImage(img.id, 1);
-                    };
-                    orderControls.appendChild(moveDownBtn);
-                }
-                
-                previewItem.appendChild(orderControls);
-            }
+                <div class="form-group">
+                    <label><i class="fas fa-image"></i> Imagen Principal</label>
+                    {% if producto.imagen %}
+                    <div class="image-preview">
+                        <label>Imagen actual:</label>
+                        <img src="{{ producto.imagen.url }}" class="thumb-preview" alt="{{ producto.titulo }}">
+                        <div class="image-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Subir nueva imagen para reemplazar</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="file-upload">
+                        <input type="file" id="imagen" name="imagen" accept="image/*">
+                        <label for="imagen" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                            <span>Haz clic para {% if producto.imagen %}cambiar{% else %}subir{% endif %} la imagen principal</span>
+                            <span class="form-help">Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
             
-            previewGrid.appendChild(previewItem);
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-percentage"></i> Descuento y Fraccionado
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label large">
+                        <input type="checkbox" name="descuento_activo" id="descuento_activo" 
+                               {% if producto.descuento_activo %}checked{% endif %}>
+                        <span class="checkbox-text">¿Este producto tiene descuento?</span>
+                    </label>
+                    
+                    <div class="descuento-fields" id="descuentoFields" 
+                         style="display: {% if producto.descuento_activo %}block{% else %}none{% endif %};">
+                        <div class="descuento-input-group">
+                            <label for="porcentaje_descuento">Porcentaje de descuento:</label>
+                            <input type="number" id="porcentaje_descuento" name="porcentaje_descuento" 
+                                   min="1" max="99" value="{{ producto.porcentaje_descuento|default_if_none:'0' }}">
+                            <span class="input-suffix">%</span>
+                        </div>
+                        
+                        <div class="precio-calculo">
+                            <div class="precio-info">
+                                <span class="precio-label">Precio original:</span>
+                                <span class="precio-valor">$<span id="precioOriginal">{{ producto.precio|floatformat:2 }}</span></span>
+                            </div>
+                            <div class="precio-info">
+                                <span class="precio-label">Descuento aplicado:</span>
+                                <span class="precio-valor descuento">- $<span id="descuentoAplicado">
+                                    {% if producto.descuento_activo %}
+                                        {% widthratio producto.precio 100 producto.porcentaje_descuento as descuento %}
+                                        {{ descuento|floatformat:2 }}
+                                    {% else %}0.00{% endif %}
+                                </span></span>
+                            </div>
+                            <div class="precio-info small">
+                                <span class="precio-label">Ahorro:</span>
+                                <span class="precio-valor ahorro"><span id="porcentajeAhorro">{{ producto.porcentaje_descuento|default_if_none:'0' }}</span>%</span>
+                            </div>
+                            <div class="precio-info">
+                                <span class="precio-label">Precio final:</span>
+                                <span class="precio-valor" style="color: #1f8e3c; font-size: 24px;">$<span id="precioFinal">
+                                    {{ producto.precio_con_descuento|floatformat:2 }}
+                                </span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label large">
+                        <input type="checkbox" name="fraccionado" id="fraccionado" 
+                               {% if producto.fraccionado %}checked{% endif %}>
+                        <span class="checkbox-text">¿Este producto puede fraccionarse? (se vende por gramos/litros)</span>
+                    </label>
+                    <div class="form-help">
+                        Si se activa, los clientes podrán comprar fracciones del producto (ej: 250g, 0.5L, etc.)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{% url 'admin_products' %}" class="btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
+                <button type="submit" name="save" class="btn-save"><i class="fas fa-save"></i> Guardar Cambios</button>
+                <button type="submit" name="delete" class="btn-delete" 
+                        onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')">
+                    <i class="fas fa-trash"></i> Eliminar Producto
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // Mostrar/ocultar campos de descuento
+        document.getElementById('descuento_activo').addEventListener('change', function() {
+            document.getElementById('descuentoFields').style.display = this.checked ? 'block' : 'none';
+            calcularDescuento();
         });
-    }
-    
-    // Función para eliminar una imagen
-    function removeImage(imageId) {
-        const index = allImages.findIndex(img => img.id === imageId);
-        if (index !== -1) {
-            const image = allImages[index];
-            
-            // Si es la imagen principal, también limpiar el input
-            if (image.type === 'main') {
-                const mainImageInput = document.getElementById('id_imagen');
-                if (mainImageInput) {
-                    mainImageInput.value = '';
-                }
-            }
-            
-            allImages.splice(index, 1);
-            updateImagePreview();
-            updateImageCount();
-        }
-    }
-    
-    // Función para mover imágenes (solo adicionales)
-    function moveImage(imageId, direction) {
-        const mainImage = allImages.find(img => img.type === 'main');
-        const additionalImages = allImages.filter(img => img.type === 'additional');
         
-        // Encontrar el índice en el array de adicionales
-        const currentIndex = additionalImages.findIndex(img => img.id === imageId);
-        const newIndex = currentIndex + direction;
+        // Calcular descuento cuando cambian los valores
+        document.getElementById('precio').addEventListener('input', calcularDescuento);
+        document.getElementById('porcentaje_descuento').addEventListener('input', calcularDescuento);
         
-        if (newIndex >= 0 && newIndex < additionalImages.length) {
-            // Intercambiar en el array de adicionales
-            [additionalImages[currentIndex], additionalImages[newIndex]] = 
-            [additionalImages[newIndex], additionalImages[currentIndex]];
+        function calcularDescuento() {
+            const precio = parseFloat(document.getElementById('precio').value) || 0;
+            const porcentaje = parseInt(document.getElementById('porcentaje_descuento').value) || 0;
             
-            // Reconstruir allImages con la imagen principal primero
-            allImages = mainImage ? [mainImage, ...additionalImages] : [...additionalImages];
+            const descuento = (precio * porcentaje) / 100;
+            const precioFinal = precio - descuento;
             
-            updateImagePreview();
+            document.getElementById('precioOriginal').textContent = precio.toFixed(2);
+            document.getElementById('descuentoAplicado').textContent = descuento.toFixed(2);
+            document.getElementById('porcentajeAhorro').textContent = porcentaje;
+            document.getElementById('precioFinal').textContent = precioFinal.toFixed(2);
         }
-    }
-    
-    // Función para actualizar el contador
-    function updateImageCount() {
-        const mainCount = allImages.filter(img => img.type === 'main').length;
-        const additionalCount = allImages.filter(img => img.type === 'additional').length;
-        const totalCount = mainCount + additionalCount;
         
-        const imageCountElement = document.getElementById('imageCount');
-        if (imageCountElement) {
-            imageCountElement.textContent = 
-                `Total de nuevas imágenes: ${totalCount} (${mainCount} principal, ${additionalCount} adicionales)`;
-            
-            // Actualizar color según si hay imágenes
-            if (totalCount === 0) {
-                imageCountElement.style.color = '#999';
-            } else {
-                imageCountElement.style.color = '#1f8e3c';
-            }
-        }
-    }
-    
-    // Funciones de descuento
-    function toggleDescuento(checkbox) {
-        const wrapPorcentaje = document.getElementById('wrap_porcentaje');
-        if (wrapPorcentaje) {
-            wrapPorcentaje.style.display = checkbox.checked ? "block" : "none";
-        }
-        calcularDescuento();
-    }
-    
-    function calcularDescuento() {
-        const precio = parseFloat(document.getElementById('id_precio').value) || 0;
-        const porcentaje = parseInt(document.getElementById('id_porcentaje').value) || 0;
-        const precioFinalElement = document.getElementById('precioFinal');
-        
-        if (precioFinalElement) {
-            if (porcentaje > 0) {
-                const descuento = precio * (porcentaje / 100);
-                const precioFinal = precio - descuento;
-                precioFinalElement.textContent = `$${precioFinal.toFixed(2)}`;
-            } else {
-                precioFinalElement.textContent = `$${precio.toFixed(2)}`;
-            }
-        }
-    }
-    
-    function confirmarEliminacion() {
-        if (confirm("¿Seguro que quieres eliminar este producto?")) {
-            document.getElementById('deleteForm').submit();
-        }
-    }
-    
-    // Configurar eventos de descuento
-    const precioInput = document.getElementById('id_precio');
-    const porcentajeInput = document.getElementById('id_porcentaje');
-    
-    if (precioInput && porcentajeInput) {
-        precioInput.addEventListener('input', calcularDescuento);
-        porcentajeInput.addEventListener('input', calcularDescuento);
-    }
-</script>
+        // Calcular descuento al cargar la página
+        window.addEventListener('load', calcularDescuento);
+    </script>
 </body>
 </html>
