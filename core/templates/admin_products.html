@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body>
     <header class="top-header">
@@ -56,6 +57,7 @@
                         <th>Categoría</th>
                         <th>Descuento</th>
                         <th>Acciones</th>
+                        <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,6 +106,14 @@
                         </td>
                         <td class="actions-column">
                             <a href="{% url 'admin_edit' p.id %}" class="btn-edit"><i class="fas fa-edit"></i> Editar</a>
+                        </td>
+                        <td class="delete-column">
+                            <form method="POST" action="{% url 'admin_delete' p.id %}" class="delete-form" onsubmit="return confirmarEliminacionLista(this, '{{ p.titulo }}');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-delete-table">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
@@ -162,5 +172,7 @@
         </div>
         {% endif %}
     </main>
+    
+    <script src="{% static 'js/admin.js' %}"></script>
 </body>
 </html>

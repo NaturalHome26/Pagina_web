@@ -8,6 +8,8 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 def home(request):
     # Búsqueda
@@ -314,3 +316,16 @@ def api_producto(request, id):
     except Exception as e:
         print(f"Error en API producto: {e}")
         return JsonResponse({"error": str(e)}, status=500)
+
+# Nueva función para eliminar producto desde la lista
+@require_POST
+def admin_delete(request, id):
+    producto = get_object_or_404(Producto, id=id)
+    
+    try:
+        producto.delete()
+        # Redirigir con un mensaje de éxito (opcional)
+        return redirect('admin_products')
+    except Exception as e:
+        # En caso de error, redirigir con un mensaje de error
+        return redirect('admin_products')
