@@ -3,6 +3,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Producto
 from django.db.models import Q
 from django.http import JsonResponse
+import json
+import base64
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.conf import settings
 
 def home(request):
     # Búsqueda
@@ -71,7 +76,6 @@ def admin_edit(request, id):
     producto = get_object_or_404(Producto, id=id)
     
     if request.method == "POST":
-
         # ELIMINAR
         if "delete" in request.POST:
             producto.delete()
@@ -82,22 +86,72 @@ def admin_edit(request, id):
         producto.precio = request.POST.get("precio", producto.precio)
         producto.unidad = request.POST.get("unidad", producto.unidad)
         producto.categoria = request.POST.get("categoria", producto.categoria)
-
-        # ✔ GUARDAR DESCRIPCIÓN
         producto.descripcion = request.POST.get("descripcion", "")
-
-        # ✔ GUARDAR FRACCIONADO
         producto.fraccionado = "fraccionado" in request.POST
         
-        # ✔ DESCUENTOS
+        # DESCUENTOS
         producto.descuento_activo = "descuento_activo" in request.POST
         porcentaje = request.POST.get("porcentaje_descuento", "0")
         producto.porcentaje_descuento = int(porcentaje) if porcentaje.isdigit() else 0
         
-        # ✔ Imagen (solo si subieron una nueva)
+        # Imagen principal (solo si subieron una nueva)
         if "imagen" in request.FILES:
             producto.imagen = request.FILES["imagen"]
         
+        # Obtener imágenes adicionales existentes
+        imagenes_adicionales = producto.get_imagenes_adicionales()
+        
+        # Eliminar imágenes marcadas para eliminación
+        imagenes_a_mantener = []
+        for i, img in enumerate(imagenes_adicionales):
+            keep_input = request.POST.get(f"keep_additional_image_{i}", "1")
+            if keep_input == "1":
+                imagenes_a_mantener.append(img)
+        
+        # Procesar nuevas imágenes adicionales (si las hay)
+        if 'additional_images_data' in request.POST and request.POST['additional_images_data']:
+            try:
+                additional_images = json.loads(request.POST['additional_images_data'])
+                
+                for img_data in additional_images:
+                    if 'base64' in img_data:
+                        # CORRECCIÓN: Manejar diferentes formatos de base64
+                        base64_data = img_data['base64']
+                        
+                        # Verificar si tiene el formato completo o solo los datos
+                        if ';base64,' in base64_data:
+                            # Formato completo: data:image/png;base64,iVBORw0...
+                            format_part, imgstr = base64_data.split(';base64,')
+                            ext = format_part.split('/')[-1] if '/' in format_part else 'png'
+                        else:
+                            # Solo datos base64 sin formato
+                            imgstr = base64_data
+                            # Intentar obtener extensión del tipo
+                            ext = img_data.get('type', 'png').split('/')[-1] if '/' in img_data.get('type', '') else 'png'
+                        
+                        # Generar nombre único para el archivo
+                        from datetime import datetime
+                        filename = f"additional_{producto.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(imagenes_a_mantener)}.{ext}"
+                        
+                        # Guardar archivo
+                        try:
+                            data = ContentFile(base64.b64decode(imgstr))
+                            file_path = default_storage.save(f'productos/adicionales/{filename}', data)
+                            
+                            # Agregar a la lista
+                            imagenes_a_mantener.append({
+                                'url': file_path,
+                                'filename': filename
+                            })
+                        except Exception as decode_error:
+                            print(f"Error decodificando base64: {decode_error}")
+                            continue
+                
+            except Exception as e:
+                print(f"Error procesando imágenes adicionales: {e}")
+        
+        # Guardar la lista actualizada
+        producto.set_imagenes_adicionales(imagenes_a_mantener)
         producto.save()
         return redirect("admin_products")
     
@@ -118,13 +172,13 @@ def admin_new(request):
 
         if "imagen" not in request.FILES:
             return render(request, "admin_new.html", {
-                "error": "Debe subir una imagen para el producto"
+                "error": "Debe subir una imagen principal para el producto"
             })
 
-        # ✔ FRACCIONADO
+        # FRACCIONADO
         fraccionado = "fraccionado" in request.POST
 
-        # ✔ DESCUENTO
+        # DESCUENTO
         descuento_activo = "descuento_activo" in request.POST
         if descuento_activo:
             porcentaje_raw = request.POST.get("porcentaje_descuento", "").strip()
@@ -133,18 +187,67 @@ def admin_new(request):
             porcentaje = 0
 
         try:
+            # Crear producto con imagen principal
             producto = Producto(
                 titulo=titulo,
                 precio=precio,
                 unidad=unidad,
                 categoria=categoria,
-                descripcion=descripcion,   # ✔ NUEVO
-                fraccionado=fraccionado,   # ✔ NUEVO
+                descripcion=descripcion,
+                fraccionado=fraccionado,
                 descuento_activo=descuento_activo,
                 porcentaje_descuento=porcentaje,
                 imagen=request.FILES["imagen"]
             )
+            
+            # Guardar primero para tener un ID
             producto.save()
+            
+            # Procesar imágenes adicionales si existen
+            imagenes_adicionales = []
+            if 'additional_images_data' in request.POST and request.POST['additional_images_data']:
+                try:
+                    additional_images = json.loads(request.POST['additional_images_data'])
+                    for img_data in additional_images:
+                        if 'base64' in img_data:
+                            # CORRECCIÓN: Manejar diferentes formatos de base64
+                            base64_data = img_data['base64']
+                            
+                            # Verificar si tiene el formato completo o solo los datos
+                            if ';base64,' in base64_data:
+                                # Formato completo: data:image/png;base64,iVBORw0...
+                                format_part, imgstr = base64_data.split(';base64,')
+                                ext = format_part.split('/')[-1] if '/' in format_part else 'png'
+                            else:
+                                # Solo datos base64 sin formato
+                                imgstr = base64_data
+                                # Intentar obtener extensión del tipo
+                                ext = img_data.get('type', 'png').split('/')[-1] if '/' in img_data.get('type', '') else 'png'
+                            
+                            # Generar nombre único
+                            from datetime import datetime
+                            filename = f"additional_{producto.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(imagenes_adicionales)}.{ext}"
+                            
+                            # Guardar archivo
+                            try:
+                                data = ContentFile(base64.b64decode(imgstr))
+                                file_path = default_storage.save(f'productos/adicionales/{filename}', data)
+                                
+                                # Agregar a la lista
+                                imagenes_adicionales.append({
+                                    'url': file_path,
+                                    'filename': filename
+                                })
+                            except Exception as decode_error:
+                                print(f"Error decodificando base64: {decode_error}")
+                                continue
+                except Exception as e:
+                    print(f"Error procesando imágenes adicionales: {e}")
+            
+            # Guardar imágenes adicionales
+            producto.set_imagenes_adicionales(imagenes_adicionales)
+            producto.save()
+            
             return redirect("admin_products")
         except Exception as e:
             return render(request, "admin_new.html", {
@@ -153,18 +256,61 @@ def admin_new(request):
 
     return render(request, "admin_new.html", {"producto": None})
 
-
 def api_producto(request, id):
-    p = Producto.objects.get(id=id)
-
-    return JsonResponse({
-        "id": p.id,
-        "titulo": p.titulo,
-        "descripcion": p.descripcion or "",
-        "precio": float(p.precio),
-        "precio_final": float(p.precio_con_descuento()),
-        "unidad": p.unidad,
-        "unidad_display": p.get_unidad_display(),
-        "imagen": p.imagen.url if p.imagen else "",
-        "fraccionado": bool(p.fraccionado),
-    })
+    try:
+        p = get_object_or_404(Producto, id=id)
+        
+        # Obtener todas las imágenes
+        todas_imagenes = []
+        
+        # Imagen principal
+        if p.imagen:
+            try:
+                # Construir URL absoluta para la imagen principal
+                main_image_url = request.build_absolute_uri(p.imagen.url)
+                todas_imagenes.append(main_image_url)
+            except Exception as e:
+                print(f"Error obteniendo URL de imagen principal: {e}")
+        
+        # Imágenes adicionales
+        imagenes_adicionales = p.get_imagenes_adicionales()
+        for img in imagenes_adicionales:
+            if 'url_completa' in img:
+                try:
+                    # Usar la URL completa ya construida por el modelo
+                    todas_imagenes.append(request.build_absolute_uri(img['url_completa']))
+                except:
+                    # Si falla, intentar construir la URL desde el campo 'url'
+                    if 'url' in img:
+                        try:
+                            img_url = default_storage.url(img['url'])
+                            todas_imagenes.append(request.build_absolute_uri(img_url))
+                        except:
+                            pass
+            elif 'url' in img:
+                try:
+                    # Construir URL desde el campo 'url'
+                    img_url = default_storage.url(img['url'])
+                    todas_imagenes.append(request.build_absolute_uri(img_url))
+                except:
+                    pass
+        
+        # Si no hay imágenes, usar placeholder
+        if not todas_imagenes:
+            todas_imagenes = [request.build_absolute_uri(settings.STATIC_URL + 'img/no-image.png')]
+        
+        return JsonResponse({
+            "id": p.id,
+            "titulo": p.titulo,
+            "descripcion": p.descripcion or "",
+            "precio": float(p.precio),
+            "precio_final": float(p.precio_con_descuento()),
+            "unidad": p.unidad,
+            "unidad_display": p.get_unidad_display(),
+            "imagen": p.imagen.url if p.imagen else "",
+            "imagenes": todas_imagenes,  # Lista de TODAS las imágenes
+            "fraccionado": bool(p.fraccionado),
+        })
+    except Exception as e:
+        print(f"Error en API producto: {e}")
+        return JsonResponse({"error": str(e)}, status=500)

@@ -108,6 +108,12 @@
             <button onclick="filtrar('frutas')" class="filter-btn {% if categoria_actual == 'frutas' %}active{% endif %}">
                 Frutas
             </button>
+            <button onclick="filtrar('canastas')" class="filter-btn {% if categoria_actual == 'canastas' %}active{% endif %}">
+                Canastas
+            </button>
+            <button onclick="filtrar('combos')" class="filter-btn {% if categoria_actual == 'combos' %}active{% endif %}">
+                Combos
+            </button>
             <button onclick="filtrar('otros')" class="filter-btn {% if categoria_actual == 'otros' %}active{% endif %}">
                 Otros
             </button>
@@ -325,7 +331,8 @@
         </div>
     </div>
 
-    <!-- MODAL DETALLE PRODUCTO -->
+    <!-- MODAL DETALLE PRODUCTO (ACTUALIZADO CON CARRUSEL DE IMÁGENES) -->
+    <!-- MODAL DETALLE PRODUCTO (ACTUALIZADO CON CARRUSEL DE IMÁGENES) -->
     <div id="modalProducto" class="modal">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
@@ -336,26 +343,41 @@
             </div>
 
             <div class="modal-body">
-                <div class="modal-product-image-container">
-                    <img id="modalProductoImagen" src="" alt="Producto">
+                <!-- CARRUSEL DE IMÁGENES -->
+                <div class="modal-product-image-carousel" id="imageCarousel">
+                    <div class="carousel-track-images" id="carouselTrackImages">
+                        <!-- Las imágenes se insertarán aquí dinámicamente -->
+                    </div>
+                    
+                    <!-- Botones de navegación -->
+                    <button class="carousel-btn-image prev-image" onclick="cambiarSlide(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn-image next-image" onclick="cambiarSlide(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <!-- Contador de imágenes -->
+                    <div class="carousel-counter" id="imageCounter">1/1</div>
+                    
+                    <!-- Puntos de navegación -->
+                    <div class="carousel-dots-images" id="carouselDotsImages"></div>
                 </div>
 
+                <!-- DESCRIPCIÓN -->
                 <div class="modal-product-description-container">
                     <div class="modal-product-description-title">
                         <i class="fas fa-info-circle"></i> Descripción
                     </div>
-
                     <div id="modalProductoDescripcion" class="descripcion-texto"></div>
                 </div>
 
                 <div class="modal-product-info-container">
-
-                    <!-- PRECIO CON MÁS ESPACIO -->
+                    <!-- PRECIO -->
                     <div class="modal-price-section">
                         <div class="price-label">
                             <i class="fas fa-tag"></i> Precio
                         </div>
-
                         <div class="price-inline">
                             <span id="modalProductoPrecio"></span>
                             <span class="price-separator">/</span>
@@ -364,7 +386,7 @@
                         </div>
                     </div>
 
-                    <!-- CANTIDAD CON BOTONES MEJORADOS -->
+                    <!-- CANTIDAD -->
                     <div class="modal-cantidad-section">
                         <div class="cantidad-label">
                             <i class="fas fa-balance-scale"></i>
@@ -375,7 +397,8 @@
                             <input id="modalProductoCantidad"
                                 type="number"
                                 min="1"
-                                value="1">
+                                value="1"
+                                onchange="validarCantidad()">
                             <span class="cantidad-sufijo" id="modalUnidadSuffix">g</span>
                             <div class="cantidad-botones">
                                 <button class="btn-cantidad btn-menos" onclick="ajustarCantidad(-1)">−</button>
@@ -389,14 +412,14 @@
             </div>
 
             <div class="modal-footer">
-                <button id="modalProductoAgregar" class="btn-send">
+                <button id="modalProductoAgregar" class="btn-send" onclick="agregarAlCarritoDesdeModal()">
                     <i class="fas fa-cart-plus"></i> Agregar al Carrito
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+   <!-- SCRIPTS -->
     <script src="{% static 'js/carrito.js' %}"></script>
     <script src="{% static 'js/producto.js' %}"></script>
     <script src="{% static 'js/carrusel.js' %}"></script>
