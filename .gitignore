@@ -15,10 +15,14 @@ env/
 .env/
 
 # === Archivos de configuración sensibles ===
-*.env
-.env.*
+.env
+.env.local
+.env.*.local
 secret.key
 *.pem
+
+# Permitir .env.example (template para otros desarrolladores)
+!.env.example
 
 # === Django ===
 db.sqlite3
@@ -30,8 +34,12 @@ db.sqlite3-journal
 
 # === Archivos estáticos generados ===
 staticfiles/
-static/
+/static/
 media/
+
+# Permitir archivos estáticos de las apps
+!core/static/
+!core/static/**
 
 # === IDEs / Editores ===
 .vscode/

@@ -1,0 +1,1083 @@
+/* === MODALES GENERALES === */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: modalSlideIn 0.3s ease;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #0b2e13;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-cerrar {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.btn-cerrar:hover {
+    color: #e63946;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Prevenir scroll en el body cuando el modal está abierto */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* === MODAL CARRITO ESPECÍFICO === */
+#modalCarrito .modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+#listaCarrito {
+    padding: 20px 25px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.carrito-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.carrito-info h4 {
+    margin: 0 0 5px 0;
+    color: #0b2e13;
+}
+
+.producto-id {
+    font-size: 12px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+.carrito-details {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.cantidad-badge {
+    background: #e8f5e9;
+    color: #1f8e3c;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.precio-unit {
+    color: #666;
+}
+
+.precio-unit span {
+    font-weight: 600;
+    color: #1f8e3c;
+}
+
+.carrito-subtotal {
+    font-weight: 700;
+    color: #0b2e13;
+}
+
+.carrito-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.carrito-actions button {
+    background: #1f8e3c;
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.carrito-actions button:hover {
+    background: #187530;
+}
+
+.carrito-actions .btn-remove {
+    background: #e63946;
+}
+
+.carrito-actions .btn-remove:hover {
+    background: #c1121f;
+}
+
+.total-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: #f0f9f0;
+    margin: 0 25px 20px;
+    border-radius: 10px;
+    border: 2px solid #d0e7d6;
+}
+
+.total-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0b2e13;
+}
+
+.total-amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #e63946;
+}
+
+#carritoVacio {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+}
+
+#carritoVacio i {
+    font-size: 60px;
+    color: #d0e7d6;
+    margin-bottom: 20px;
+}
+
+#carritoVacio p {
+    color: #666;
+    font-size: 16px;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.modal-footer .btn-send {
+    flex: 2;
+    padding: 14px;
+    background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-footer .btn-send:hover {
+    background: linear-gradient(135deg, #187530 0%, #0f9c40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(31, 142, 60, 0.3);
+}
+
+.modal-footer .btn-cancelar {
+    flex: 1;
+    padding: 14px;
+    background: white;
+    border: 2px solid #d0e7d6;
+    border-radius: 10px;
+    color: #1f8e3c;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modal-footer .btn-cancelar:hover {
+    background: #f0f9f0;
+    border-color: #1f8e3c;
+}
+
+/* === MODAL PRODUCTO ESPECÍFICO === */
+#modalProducto .modal-content {
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* === CARRUSEL DE IMÁGENES EN MODAL === */
+.modal-product-image-carousel {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    background: #f5f5f5;
+}
+
+.carousel-track-images {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease;
+}
+
+.carousel-slide-image {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.carousel-slide-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.carousel-btn-image {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+    transition: all 0.3s;
+    color: #1f8e3c;
+    font-size: 18px;
+}
+
+.carousel-btn-image:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.carousel-btn-image.prev-image {
+    left: 10px;
+}
+
+.carousel-btn-image.next-image {
+    right: 10px;
+}
+
+.carousel-counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.carousel-dots-images {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-dot-image {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s;
+}
+
+.carousel-dot-image:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+.carousel-dot-image.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+.no-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 16px;
+    height: 100%;
+}
+
+.no-image-placeholder i {
+    font-size: 60px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.modal-product-description-container {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #e8f5e9;
+    border-radius: 12px;
+    background: #f9fffa;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.modal-product-description-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #0b2e13;
+    font-size: 16px;
+}
+
+.descripcion-texto {
+    white-space: pre-line;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    min-height: 20px;
+}
+
+.modal-product-info-container {
+    margin-top: 20px;
+}
+
+.modal-price-section {
+    margin-bottom: 25px;
+}
+
+.price-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #0b2e13;
+    font-size: 16px;
+}
+
+.price-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #1f8e3c;
+}
+
+.price-separator {
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.unit-badge-modal {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 20px;
+    font-size: 12px;
+    color: #2e7d32;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+}
+
+.modal-cantidad-section {
+    margin-top: 20px;
+}
+
+.cantidad-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #0b2e13;
+    font-size: 16px;
+}
+
+.cantidad-linea {
+    display: flex;
+    align-items: stretch;
+    height: 48px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #d0e7d6;
+    background: white;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.cantidad-linea:focus-within {
+    border-color: #12b84e;
+    box-shadow: 0 0 0 3px rgba(18, 184, 78, 0.1);
+}
+
+.cantidad-linea input {
+    flex: 1;
+    height: 100%;
+    padding: 0 15px;
+    text-align: center;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+    min-width: 0;
+    color: #0b2e13;
+    background: white;
+}
+
+.cantidad-sufijo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    background: #f0f9f0;
+    font-weight: 700;
+    color: #1f8e3c;
+    border-left: 1px solid #d0e7d6;
+    border-right: 1px solid #d0e7d6;
+    min-width: 50px;
+}
+
+.cantidad-botones {
+    display: flex;
+    background: #1f8e3c;
+}
+
+.cantidad-botones .btn-cantidad {
+    width: 48px;
+    height: 100%;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    padding: 0;
+}
+
+.cantidad-botones .btn-cantidad:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.cantidad-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.cantidad-preset {
+    padding: 10px 18px;
+    background: white;
+    border: 2px solid #d0e7d6;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1f8e3c;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 60px;
+    text-align: center;
+}
+
+.cantidad-preset:hover {
+    background: #f0f9f0;
+    border-color: #1f8e3c;
+    transform: translateY(-2px);
+}
+
+.cantidad-preset.active {
+    background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 8px rgba(31, 142, 60, 0.2);
+}
+
+/* Quitar flechas de input number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* === MODAL ENVÍO ESPECÍFICO === */
+.modal-envio-content {
+    max-width: 600px;
+    width: 95%;
+    max-height: 85vh;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #0b2e13;
+    font-size: 15px;
+}
+
+.form-group label i {
+    color: #1f8e3c;
+    width: 20px;
+    text-align: center;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #d0e7d6;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #12b84e;
+    box-shadow: 0 4px 12px rgba(18, 184, 78, 0.15);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.pago-options {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.pago-option {
+    flex: 1;
+    min-width: 140px;
+    cursor: pointer;
+}
+
+.pago-option input[type="radio"] {
+    display: none;
+}
+
+.pago-option-content {
+    padding: 15px;
+    background: white;
+    border: 2px solid #d0e7d6;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.pago-option-content i {
+    font-size: 24px;
+    color: #666;
+}
+
+.pago-option-content span {
+    font-weight: 600;
+    color: #444;
+}
+
+.pago-option input[type="radio"]:checked + .pago-option-content {
+    background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
+    border-color: #12b84e;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(31, 142, 60, 0.2);
+}
+
+.pago-option input[type="radio"]:checked + .pago-option-content i,
+.pago-option input[type="radio"]:checked + .pago-option-content span {
+    color: white;
+}
+
+.pago-option:hover .pago-option-content {
+    border-color: #1f8e3c;
+    transform: translateY(-2px);
+}
+
+.total-pedido {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f0f9f0;
+    border-radius: 10px;
+    margin: 25px 0;
+    border: 2px solid #d0e7d6;
+}
+
+.total-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0b2e13;
+}
+
+.total-amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: #e63946;
+}
+
+.leyenda-info {
+    padding: 15px;
+    background: #fff8e1;
+    border-radius: 10px;
+    border-left: 4px solid #ffb300;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+}
+
+.leyenda-info i {
+    color: #ffb300;
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.leyenda-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #5d4037;
+    line-height: 1.5;
+}
+
+.leyenda-info strong {
+    color: #e65100;
+}
+
+.form-footer {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.form-footer .btn-cancelar {
+    flex: 1;
+    padding: 14px;
+    background: white;
+    border: 2px solid #d0e7d6;
+    border-radius: 10px;
+    color: #1f8e3c;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 180px;
+}
+
+.form-footer .btn-cancelar:hover {
+    background: #f0f9f0;
+    border-color: #1f8e3c;
+    transform: translateY(-2px);
+}
+
+.form-footer .btn-confirmar {
+    flex: 2;
+    padding: 14px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 240px;
+}
+
+.form-footer .btn-confirmar:hover {
+    background: linear-gradient(135deg, #1ebe57 0%, #0e7a67 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+/* CONFIRMACIÓN DE PEDIDO */
+.confirmacion-pedido {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.confirmacion-icon {
+    font-size: 60px;
+    color: #25D366;
+    margin-bottom: 20px;
+    animation: bounce 1s ease infinite alternate;
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
+.confirmacion-pedido h3 {
+    color: #1f8e3c;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.confirmacion-pedido p {
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.confirmacion-detalles {
+    background: #f0f9f0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+    border-left: 4px solid #1f8e3c;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d0e7d6;
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.detalle-label {
+    font-weight: 600;
+    color: #0b2e13;
+}
+
+.detalle-valor {
+    color: #333;
+    font-weight: 500;
+}
+
+/* === NOTIFICACIONES === */
+.notificacion {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #1f8e3c 0%, #12b84e 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(31, 142, 60, 0.3);
+    z-index: 3000;
+    animation: slideInRight 0.3s ease;
+    max-width: 300px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.notificacion-error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+    }
+    
+    .modal-product-image-carousel {
+        height: 250px;
+    }
+    
+    .carousel-btn-image {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .cantidad-linea {
+        height: 44px;
+    }
+    
+    .cantidad-linea input {
+        font-size: 15px;
+        padding: 0 12px;
+    }
+    
+    .cantidad-sufijo {
+        padding: 0 12px;
+        min-width: 45px;
+        font-size: 14px;
+    }
+    
+    .cantidad-botones .btn-cantidad {
+        width: 44px;
+        font-size: 18px;
+    }
+    
+    .cantidad-preset {
+        padding: 8px 15px;
+        font-size: 13px;
+        min-width: 55px;
+    }
+    
+    .pago-options {
+        flex-direction: column;
+    }
+    
+    .pago-option {
+        width: 100%;
+    }
+    
+    .form-footer {
+        flex-direction: column;
+    }
+    
+    .form-footer .btn-cancelar,
+    .form-footer .btn-confirmar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-product-image-carousel {
+        height: 200px;
+    }
+    
+    .carousel-btn-image {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .carousel-counter {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+    
+    .cantidad-linea {
+        height: 42px;
+    }
+    
+    .cantidad-linea input {
+        font-size: 14px;
+        padding: 0 10px;
+    }
+    
+    .cantidad-sufijo {
+        padding: 0 10px;
+        min-width: 40px;
+        font-size: 13px;
+    }
+    
+    .cantidad-botones .btn-cantidad {
+        width: 42px;
+        font-size: 16px;
+    }
+    
+    .cantidad-preset {
+        padding: 7px 12px;
+        font-size: 12px;
+        min-width: 50px;
+    }
+    
+    .total-pedido {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .total-pedido .total-amount {
+        font-size: 22px;
+    }
+    
+    .descripcion-texto {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+}
+
+/* === MEJORAS PARA DESCRIPCIÓN DEL PRODUCTO === */
+.descripcion-texto {
+    white-space: pre-line;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    min-height: 20px;
+    margin: 0;
+}
+
+/* Estilos para listas en descripción */
+.descripcion-texto ul,
+.descripcion-texto ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.descripcion-texto li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+/* Mejoras responsive para descripción */
+@media (max-width: 768px) {
+    .modal-product-description-container {
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .descripcion-texto {
+        font-size: 13.5px;
+        line-height: 1.5;
+    }
+    
+    .descripcion-texto ul,
+    .descripcion-texto ol {
+        padding-left: 18px;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-product-description-container {
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    .descripcion-texto {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    
+    .descripcion-texto ul,
+    .descripcion-texto ol {
+        padding-left: 16px;
+    }
+    
+    .descripcion-texto li {
+        margin-bottom: 3px;
+    }
+}

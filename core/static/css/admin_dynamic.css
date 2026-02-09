@@ -1,0 +1,123 @@
+/* ============================================
+   ESTILOS PARA COMPONENTES DINÁMICOS - ADMIN
+   ============================================ */
+
+/* === Campo de descuento - Estados de visibilidad === */
+.descuento-fields.hidden {
+    display: none;
+}
+
+.descuento-fields.visible {
+    display: block;
+}
+
+/* === Vista previa de imagen - Estados de visibilidad === */
+.image-preview.hidden {
+    display: none;
+}
+
+.image-preview.visible {
+    display: block;
+}
+
+/* === Precio final destacado === */
+.precio-final-destacado {
+    color: #1f8e3c;
+    font-size: 24px;
+}
+
+/* === Delete form flex === */
+.delete-form-flex {
+    flex: 1;
+}
+
+/* === Notificación flotante === */
+.notificacion-flotante {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: slideInRight 0.3s ease;
+    max-width: 350px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.notificacion-flotante.success {
+    background: #28a745;
+}
+
+.notificacion-flotante.error {
+    background: #dc3545;
+}
+
+.notificacion-flotante.info {
+    background: #17a2b8;
+}
+
+/* === Animaciones === */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* === Confirmación de pedido === */
+.confirmacion-pedido .confirmacion-icon {
+    color: #25D366;
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.confirmacion-detalles {
+    background: #f0f9f0;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: left;
+    border-left: 4px solid #1f8e3c;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d0e7d6;
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-label {
+    font-weight: 600;
+    color: #0b2e13;
+}
+
+.detalle-valor {
+    color: #333;
+    font-weight: 500;
+}
