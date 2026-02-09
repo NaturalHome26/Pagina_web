@@ -12,10 +12,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.sessions.backends.db import SessionStore
 
-# Credenciales fijas para el admin (puedes cambiarlas)
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
-
 def login_required_admin(view_func):
     """Decorador personalizado para verificar si el usuario está logueado como admin"""
     def wrapper(request, *args, **kwargs):
@@ -34,8 +30,9 @@ def admin_login(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
-        
-        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+
+        # Verificar credenciales desde settings (cargadas desde .env)
+        if username == settings.ADMIN_USERNAME and password == settings.ADMIN_PASSWORD:
             # Credenciales correctas
             request.session['admin_logged_in'] = True
             request.session['admin_username'] = username

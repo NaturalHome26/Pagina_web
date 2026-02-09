@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_dynamic.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="admin-page">
@@ -130,8 +131,7 @@
                         <span class="checkbox-text">¿Este producto tiene descuento?</span>
                     </label>
                     
-                    <div class="descuento-fields" id="descuentoFields" 
-                         style="display: {% if producto.descuento_activo %}block{% else %}none{% endif %};">
+                    <div class="descuento-fields {% if producto.descuento_activo %}visible{% else %}hidden{% endif %}" id="descuentoFields">
                         <div class="descuento-input-group">
                             <label for="porcentaje_descuento">Porcentaje de descuento:</label>
                             <input type="number" id="porcentaje_descuento" name="porcentaje_descuento" 
@@ -159,7 +159,7 @@
                             </div>
                             <div class="precio-info">
                                 <span class="precio-label">Precio final:</span>
-                                <span class="precio-valor" style="color: #1f8e3c; font-size: 24px;">$<span id="precioFinal">
+                                <span class="precio-valor precio-final-destacado">$<span id="precioFinal">
                                     {{ producto.precio_con_descuento|floatformat:2 }}
                                 </span></span>
                             </div>
@@ -182,40 +182,13 @@
             <div class="form-actions">
                 <a href="{% url 'admin_products' %}" class="btn-cancel"><i class="fas fa-times"></i> Cancelar</a>
                 <button type="submit" name="save" class="btn-save"><i class="fas fa-save"></i> Guardar Cambios</button>
-                <button type="submit" name="delete" class="btn-delete" 
-                        onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')">
+                <button type="submit" name="delete" class="btn-delete">
                     <i class="fas fa-trash"></i> Eliminar Producto
                 </button>
             </div>
         </form>
     </main>
 
-    <script>
-        // Mostrar/ocultar campos de descuento
-        document.getElementById('descuento_activo').addEventListener('change', function() {
-            document.getElementById('descuentoFields').style.display = this.checked ? 'block' : 'none';
-            calcularDescuento();
-        });
-        
-        // Calcular descuento cuando cambian los valores
-        document.getElementById('precio').addEventListener('input', calcularDescuento);
-        document.getElementById('porcentaje_descuento').addEventListener('input', calcularDescuento);
-        
-        function calcularDescuento() {
-            const precio = parseFloat(document.getElementById('precio').value) || 0;
-            const porcentaje = parseInt(document.getElementById('porcentaje_descuento').value) || 0;
-            
-            const descuento = (precio * porcentaje) / 100;
-            const precioFinal = precio - descuento;
-            
-            document.getElementById('precioOriginal').textContent = precio.toFixed(2);
-            document.getElementById('descuentoAplicado').textContent = descuento.toFixed(2);
-            document.getElementById('porcentajeAhorro').textContent = porcentaje;
-            document.getElementById('precioFinal').textContent = precioFinal.toFixed(2);
-        }
-        
-        // Calcular descuento al cargar la página
-        window.addEventListener('load', calcularDescuento);
-    </script>
+    <script src="{% static 'js/admin_forms.js' %}"></script>
 </body>
 </html>

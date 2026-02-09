@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_dynamic.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
@@ -60,6 +61,8 @@
         </div>
         
         {% if productos %}
+        
+        <!-- VISTA DE TABLA (DESKTOP) -->
         <div class="table-responsive">
             <table class="tabla-admin">
                 <thead>
@@ -136,6 +139,91 @@
             </table>
         </div>
         
+        <!-- VISTA DE TARJETAS (MÓVILES) -->
+        <div class="products-cards">
+            {% for p in productos %}
+            <div class="product-card">
+                <div class="product-card-header">
+                    <div class="product-card-image">
+                        {% if p.imagen %}
+                        <img src="{{ p.imagen.url }}" alt="{{ p.titulo }}">
+                        {% else %}
+                        <div class="no-image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-card-title">
+                        <h3>{{ p.titulo }}</h3>
+                        <span class="product-id">ID: {{ p.id }}</span>
+                    </div>
+                </div>
+                
+                <div class="product-card-body">
+                    <div class="product-card-field">
+                        <div class="product-card-label">Precio</div>
+                        <div class="product-card-value">
+                            {% if p.descuento_activo %}
+                            <div class="price-with-discount">
+                                <span class="original-price">${{ p.precio }}</span>
+                                <span class="discount-price">${{ p.precio_con_descuento }}</span>
+                            </div>
+                            {% else %}
+                            <span class="normal-price">${{ p.precio }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-field">
+                        <div class="product-card-label">Unidad</div>
+                        <div class="product-card-value">
+                            <span class="unit-badge">{{ p.get_unidad_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-field">
+                        <div class="product-card-label">Categoría</div>
+                        <div class="product-card-value">
+                            <span class="category-badge {{ p.categoria }}">
+                                {% if p.categoria == "frutas" %}<i class="fas fa-apple-alt"></i>{% endif %}
+                                {% if p.categoria == "verduras" %}<i class="fas fa-carrot"></i>{% endif %}
+                                {% if p.categoria == "canastas" %}<i class="fas fa-basket-shopping"></i>{% endif %}
+                                {% if p.categoria == "combos" %}<i class="fas fa-box"></i>{% endif %}
+                                {% if p.categoria == "otros" %}<i class="fas fa-shopping-basket"></i>{% endif %}
+                                {{ p.get_categoria_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-field">
+                        <div class="product-card-label">Descuento</div>
+                        <div class="product-card-value">
+                            {% if p.descuento_activo %}
+                            <span class="badge-descuento-table">
+                                <i class="fas fa-percentage"></i> {{ p.porcentaje_descuento }}%
+                            </span>
+                            {% else %}
+                            <span class="badge-no">—</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card-actions">
+                    <a href="{% url 'admin_edit' p.id %}" class="btn-edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <form method="POST" action="{% url 'admin_delete' p.id %}" class="delete-form delete-form-flex" onsubmit="return confirmarEliminacionLista(this, '{{ p.titulo }}');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete-table">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
         {% if productos.paginator.num_pages > 1 %}
         <div class="pagination">
             <div class="pagination-info">
@@ -189,5 +277,10 @@
     </main>
     
     <script src="{% static 'js/admin.js' %}"></script>
+    <script>
+        function confirmarEliminacionLista(form, titulo) {
+            return confirm('¿Seguro que quieres eliminar el producto "' + titulo + '"?');
+        }
+    </script>
 </body>
 </html>

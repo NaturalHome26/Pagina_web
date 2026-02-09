@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin_header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_dynamic.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="admin-page">
@@ -112,7 +113,7 @@
                             <span class="form-help">Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB</span>
                         </label>
                     </div>
-                    <div class="image-preview" id="imagePreview" style="display: none;">
+                    <div class="image-preview hidden" id="imagePreview">
                         <label>Vista previa:</label>
                         <img id="previewImage" class="thumb-preview" src="#" alt="Vista previa">
                         <div class="image-info">
@@ -133,8 +134,8 @@
                         <input type="checkbox" name="descuento_activo" id="descuento_activo">
                         <span class="checkbox-text">¿Este producto tiene descuento?</span>
                     </label>
-                    
-                    <div class="descuento-fields" id="descuentoFields" style="display: none;">
+
+                    <div class="descuento-fields hidden" id="descuentoFields">
                         <div class="descuento-input-group">
                             <label for="porcentaje_descuento">Porcentaje de descuento:</label>
                             <input type="number" id="porcentaje_descuento" name="porcentaje_descuento" 
@@ -157,7 +158,7 @@
                             </div>
                             <div class="precio-info">
                                 <span class="precio-label">Precio final:</span>
-                                <span class="precio-valor" style="color: #1f8e3c; font-size: 24px;">$<span id="precioFinal">0.00</span></span>
+                                <span class="precio-valor precio-final-destacado">$<span id="precioFinal">0.00</span></span>
                             </div>
                         </div>
                     </div>
@@ -181,52 +182,6 @@
         </form>
     </main>
 
-    <script>
-        // Mostrar/ocultar campos de descuento
-        document.getElementById('descuento_activo').addEventListener('change', function() {
-            document.getElementById('descuentoFields').style.display = this.checked ? 'block' : 'none';
-            calcularDescuento();
-        });
-        
-        // Calcular descuento cuando cambian los valores
-        document.getElementById('precio').addEventListener('input', calcularDescuento);
-        document.getElementById('porcentaje_descuento').addEventListener('input', calcularDescuento);
-        
-        function calcularDescuento() {
-            const precio = parseFloat(document.getElementById('precio').value) || 0;
-            const porcentaje = parseInt(document.getElementById('porcentaje_descuento').value) || 0;
-            
-            const descuento = (precio * porcentaje) / 100;
-            const precioFinal = precio - descuento;
-            
-            document.getElementById('precioOriginal').textContent = precio.toFixed(2);
-            document.getElementById('descuentoAplicado').textContent = descuento.toFixed(2);
-            document.getElementById('porcentajeAhorro').textContent = porcentaje;
-            document.getElementById('precioFinal').textContent = precioFinal.toFixed(2);
-        }
-        
-        // Vista previa de imagen
-        document.getElementById('imagen').addEventListener('change', function(e) {
-            const preview = document.getElementById('imagePreview');
-            const previewImage = document.getElementById('previewImage');
-            
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                
-                reader.readAsDataURL(this.files[0]);
-            } else {
-                preview.style.display = 'none';
-                previewImage.src = '#';
-            }
-        });
-        
-        // Calcular descuento al cargar la página
-        window.addEventListener('load', calcularDescuento);
-    </script>
+    <script src="{% static 'js/admin_forms.js' %}"></script>
 </body>
 </html>
