@@ -1,7 +1,7 @@
 /* === ADMIN CONTAINER === */
 .admin-container {
-    width: 95%;
-    max-width: 1200px;
+    width: 96%;
+    max-width: 1280px;
     margin: 30px auto;
     background: white;
     padding: 35px;
@@ -403,7 +403,7 @@
 .tabla-admin {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1000px;
+    min-width: 950px;
 }
 
 .tabla-admin thead {
@@ -411,11 +411,11 @@
 }
 
 .tabla-admin th {
-    padding: 18px 20px;
+    padding: 16px 15px;
     text-align: left;
     color: white;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -435,7 +435,7 @@
 }
 
 .tabla-admin td {
-    padding: 20px;
+    padding: 16px 12px;
     vertical-align: middle;
 }
 
@@ -501,28 +501,28 @@
 
 .unit-badge {
     display: inline-block;
-    padding: 6px 14px;
+    padding: 6px 12px;
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     color: #2e7d32;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-align: center;
-    min-width: 80px;
+    min-width: 70px;
 }
 
 .category-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 6px;
+    padding: 7px 14px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: capitalize;
-    min-width: 110px;
+    min-width: 95px;
     justify-content: center;
 }
 
@@ -554,15 +554,15 @@
 .badge-descuento-table {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 5px;
+    padding: 6px 12px;
     background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
     color: white;
     border-radius: 15px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     box-shadow: 0 3px 8px rgba(230, 57, 70, 0.2);
-    min-width: 65px;
+    min-width: 58px;
     justify-content: center;
 }
 
@@ -577,19 +577,19 @@
 }
 
 .btn-delete-table {
-    padding: 8px 14px;
+    padding: 8px 12px;
     background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: all 0.3s;
-    min-width: 95px;
+    min-width: 85px;
     justify-content: center;
 }
 
@@ -607,10 +607,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 14px;
-    min-width: 90px;
+    gap: 5px;
+    padding: 8px 12px;
+    min-width: 75px;
     height: 36px;
+    font-size: 12px;
 }
 
 .actions-column, .delete-column {

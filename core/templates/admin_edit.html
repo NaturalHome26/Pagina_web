@@ -117,13 +117,54 @@
                         </label>
                     </div>
                 </div>
+
+                <!-- Imágenes Adicionales Existentes -->
+                <div class="form-group">
+                    <label><i class="fas fa-images"></i> Imágenes Adicionales</label>
+
+                    {% if producto.get_imagenes_adicionales %}
+                    <div class="additional-images-gallery" id="existingGallery">
+                        {% for img in producto.get_imagenes_adicionales %}
+                        <div class="additional-image-item" data-index="{{ forloop.counter0 }}">
+                            <img src="{{ img.url_completa }}" alt="Imagen adicional {{ forloop.counter }}">
+                            <div class="additional-image-actions">
+                                <button type="button" class="btn-remove-additional"
+                                        title="Eliminar esta imagen"
+                                        data-index="{{ forloop.counter0 }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <input type="hidden"
+                                   name="keep_additional_image_{{ forloop.counter0 }}"
+                                   id="keep_{{ forloop.counter0 }}"
+                                   value="1">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="form-help">No hay imágenes adicionales actualmente</p>
+                    {% endif %}
+
+                    <!-- Subir nuevas imágenes -->
+                    <div class="file-upload" style="margin-top: 20px;">
+                        <input type="file" id="imagenesAdicionales" accept="image/*" multiple>
+                        <label for="imagenesAdicionales" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                            <span>Agregar más imágenes (máx. 5 adicionales)</span>
+                            <span class="form-help">Formatos: JPG, PNG, GIF. Tamaño máximo por imagen: 5MB</span>
+                        </label>
+                    </div>
+
+                    <div class="additional-images-gallery hidden" id="additionalGallery"></div>
+                    <input type="hidden" name="additional_images_data" id="additionalImagesData">
+                </div>
             </div>
-            
+
             <div class="form-section">
                 <div class="form-section-title">
                     <i class="fas fa-percentage"></i> Descuento y Fraccionado
                 </div>
-                
+
                 <div class="form-group">
                     <label class="checkbox-label large">
                         <input type="checkbox" name="descuento_activo" id="descuento_activo" 

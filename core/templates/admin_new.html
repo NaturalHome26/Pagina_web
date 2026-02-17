@@ -122,8 +122,29 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Imágenes Adicionales -->
+                <div class="form-group">
+                    <label><i class="fas fa-images"></i> Imágenes Adicionales (opcional)</label>
+                    <p class="form-help">Sube hasta 5 imágenes adicionales que se mostrarán en el carrusel del producto</p>
+
+                    <div class="file-upload">
+                        <input type="file" id="imagenesAdicionales" accept="image/*" multiple>
+                        <label for="imagenesAdicionales" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                            <span>Haz clic para seleccionar imágenes (máx. 5)</span>
+                            <span class="form-help">Formatos: JPG, PNG, GIF. Tamaño máximo por imagen: 5MB</span>
+                        </label>
+                    </div>
+
+                    <!-- Galería de preview -->
+                    <div class="additional-images-gallery hidden" id="additionalGallery"></div>
+
+                    <!-- Campo oculto para enviar JSON base64 -->
+                    <input type="hidden" name="additional_images_data" id="additionalImagesData">
+                </div>
             </div>
-            
+
             <div class="form-section">
                 <div class="form-section-title">
                     <i class="fas fa-percentage"></i> Descuento y Fraccionado
